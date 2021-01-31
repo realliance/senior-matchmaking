@@ -1,0 +1,13 @@
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# Extras
+README.md
+.eslintignore
+.eslintrc
+jest.config.ts
+node_modules
+bin

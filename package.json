@@ -11,6 +11,7 @@
     "@typescript-eslint/parser": "^4.14.1",
     "eslint": "^7.18.0",
     "grpc-tools": "^1.10.0",
+    "grpc_tools_node_protoc_ts": "^5.1.1",
     "jest": "^26.6.3",
     "ts-node-dev": "^1.1.1"
   },
@@ -25,6 +26,9 @@
     "start": "node ./bin/server.js",
     "dev": "ts-node-dev --respawn ./src/server.ts",
     "lint": "eslint src",
-    "test": "jest"
+    "test": "jest",
+    "proto:gen-code": "grpc_tools_node_protoc --js_out=import_style=commonjs,binary:./src/ --grpc_out=./src ./proto/*.proto",
+    "proto:gen-types": "grpc_tools_node_protoc --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts --ts_out=./src ./proto/*.proto",
+    "proto":"yarn proto:gen-code && yarn proto:gen-types"
   }
 }

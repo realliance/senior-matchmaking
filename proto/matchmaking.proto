@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+enum Status {
+    STATUS_OK = 0;
+    STATUS_ERR = 1;
+}
+
+message MMQClientUpdate {
+    enum QueueOperation {
+        OP_JOIN = 0;
+        OP_EXIT = 1;
+    }
+
+    QueueOperation requestedOperation = 1;
+}
+
+message MMQServerUpdate {
+    enum QueueUpdate {
+        STATUS_CANCELLED_SOFT = 0; //Client is still in the pool, but confirmation cancelled
+        STATUS_CANCELLED_HARD = 1; //Client failed to send confirmation and kicked from pool
+        STATUS_PENDING_CONFIRMATION = 2; //Client needs to acknowledge with confirmation endpoint
+        STATUS_QUEUE_UPDATE = 3; //Server updated queue parameters
+        STATUS_MATCH_FOUND = 4; //A match has been found, client must query GetMatchParameters for server info
+        STATUS_RECONNECT = 5; //A match is already in progress for this client. Query GetMatchParameters and reconnect.
+        STATUS_ACK = 6; //Client has joined queue
+    }
+
+    QueueUpdate status = 1;
+    uint32 est_queue_time = 2;
+}
+
+message AuthenticateRequest {
+    string token = 1;
+}
+
+message AuthenticateResponse {
+    Status status = 1;
+}
+
+message ConfirmRequest {
+}
+
+message ConfirmResponse {
+    Status status = 1;
+}
+
+message MatchParametersRequest {
+
+}
+
+message MatchParameters {
+    enum MatchStatus {
+        OK = 0;
+        ERR_NONEXISTANT = 1;
+    }
+
+    MatchStatus status = 1;
+    string ip = 2;
+    uint32 port = 3;
+}
+
+service MatchMaking {
+    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
+    rpc Queue(stream MMQClientUpdate) returns (stream MMQServerUpdate);
+    rpc ConfirmMatch(ConfirmRequest) returns (ConfirmResponse);
+    rpc GetMatchParameters(MatchParametersRequest) returns (MatchParameters);
+}

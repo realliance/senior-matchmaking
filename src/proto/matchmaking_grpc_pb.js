@@ -1,7 +1,7 @@
 // GENERATED CODE -- DO NOT EDIT!
 
 'use strict';
-var grpc = require('grpc');
+var grpc = require('@grpc/grpc-js');
 var proto_matchmaking_pb = require('../proto/matchmaking_pb.js');
 
 function serialize_AuthenticateRequest(arg) {

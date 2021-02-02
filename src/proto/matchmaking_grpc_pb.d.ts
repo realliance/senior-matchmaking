@@ -4,7 +4,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
+import {handleClientStreamingCall} from "@grpc/grpc-js/build/src/server-call";
 import * as proto_matchmaking_pb from "../proto/matchmaking_pb";
 
 interface IMatchMakingService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
@@ -53,7 +54,7 @@ interface IMatchMakingService_IGetMatchParameters extends grpc.MethodDefinition<
 
 export const MatchMakingService: IMatchMakingService;
 
-export interface IMatchMakingServer {
+export interface IMatchMakingServer extends grpc.UntypedServiceImplementation {
     authenticate: grpc.handleUnaryCall<proto_matchmaking_pb.AuthenticateRequest, proto_matchmaking_pb.AuthenticateResponse>;
     queue: grpc.handleBidiStreamingCall<proto_matchmaking_pb.MMQClientUpdate, proto_matchmaking_pb.MMQServerUpdate>;
     confirmMatch: grpc.handleUnaryCall<proto_matchmaking_pb.ConfirmRequest, proto_matchmaking_pb.ConfirmResponse>;
@@ -76,7 +77,7 @@ export interface IMatchMakingClient {
 }
 
 export class MatchMakingClient extends grpc.Client implements IMatchMakingClient {
-    constructor(address: string, credentials: grpc.ChannelCredentials, options?: object);
+    constructor(address: string, credentials: grpc.ChannelCredentials, options?: Partial<grpc.ClientOptions>);
     public authenticate(request: proto_matchmaking_pb.AuthenticateRequest, callback: (error: grpc.ServiceError | null, response: proto_matchmaking_pb.AuthenticateResponse) => void): grpc.ClientUnaryCall;
     public authenticate(request: proto_matchmaking_pb.AuthenticateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: proto_matchmaking_pb.AuthenticateResponse) => void): grpc.ClientUnaryCall;
     public authenticate(request: proto_matchmaking_pb.AuthenticateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: proto_matchmaking_pb.AuthenticateResponse) => void): grpc.ClientUnaryCall;

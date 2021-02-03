@@ -29,14 +29,6 @@ message MMQServerUpdate {
     uint32 est_queue_time = 2;
 }
 
-message AuthenticateRequest {
-    string token = 1;
-}
-
-message AuthenticateResponse {
-    Status status = 1;
-}
-
 message ConfirmRequest {
 }
 
@@ -60,7 +52,6 @@ message MatchParameters {
 }
 
 service MatchMaking {
-    rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
     rpc Queue(stream MMQClientUpdate) returns (stream MMQServerUpdate);
     rpc ConfirmMatch(ConfirmRequest) returns (ConfirmResponse);
     rpc GetMatchParameters(MatchParametersRequest) returns (MatchParameters);

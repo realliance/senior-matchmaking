@@ -69,48 +69,6 @@ export namespace MMQServerUpdate {
 
 }
 
-export class AuthenticateRequest extends jspb.Message { 
-    getToken(): string;
-    setToken(value: string): AuthenticateRequest;
-
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): AuthenticateRequest.AsObject;
-    static toObject(includeInstance: boolean, msg: AuthenticateRequest): AuthenticateRequest.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: AuthenticateRequest, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): AuthenticateRequest;
-    static deserializeBinaryFromReader(message: AuthenticateRequest, reader: jspb.BinaryReader): AuthenticateRequest;
-}
-
-export namespace AuthenticateRequest {
-    export type AsObject = {
-        token: string,
-    }
-}
-
-export class AuthenticateResponse extends jspb.Message { 
-    getStatus(): Status;
-    setStatus(value: Status): AuthenticateResponse;
-
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): AuthenticateResponse.AsObject;
-    static toObject(includeInstance: boolean, msg: AuthenticateResponse): AuthenticateResponse.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: AuthenticateResponse, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): AuthenticateResponse;
-    static deserializeBinaryFromReader(message: AuthenticateResponse, reader: jspb.BinaryReader): AuthenticateResponse;
-}
-
-export namespace AuthenticateResponse {
-    export type AsObject = {
-        status: Status,
-    }
-}
-
 export class ConfirmRequest extends jspb.Message { 
 
     serializeBinary(): Uint8Array;

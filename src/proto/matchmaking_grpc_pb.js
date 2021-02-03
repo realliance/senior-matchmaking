@@ -4,28 +4,6 @@
 var grpc = require('@grpc/grpc-js');
 var proto_matchmaking_pb = require('../proto/matchmaking_pb.js');
 
-function serialize_AuthenticateRequest(arg) {
-  if (!(arg instanceof proto_matchmaking_pb.AuthenticateRequest)) {
-    throw new Error('Expected argument of type AuthenticateRequest');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_AuthenticateRequest(buffer_arg) {
-  return proto_matchmaking_pb.AuthenticateRequest.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
-function serialize_AuthenticateResponse(arg) {
-  if (!(arg instanceof proto_matchmaking_pb.AuthenticateResponse)) {
-    throw new Error('Expected argument of type AuthenticateResponse');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_AuthenticateResponse(buffer_arg) {
-  return proto_matchmaking_pb.AuthenticateResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_ConfirmRequest(arg) {
   if (!(arg instanceof proto_matchmaking_pb.ConfirmRequest)) {
     throw new Error('Expected argument of type ConfirmRequest');
@@ -94,17 +72,6 @@ function deserialize_MatchParametersRequest(buffer_arg) {
 
 
 var MatchMakingService = exports.MatchMakingService = {
-  authenticate: {
-    path: '/MatchMaking/Authenticate',
-    requestStream: false,
-    responseStream: false,
-    requestType: proto_matchmaking_pb.AuthenticateRequest,
-    responseType: proto_matchmaking_pb.AuthenticateResponse,
-    requestSerialize: serialize_AuthenticateRequest,
-    requestDeserialize: deserialize_AuthenticateRequest,
-    responseSerialize: serialize_AuthenticateResponse,
-    responseDeserialize: deserialize_AuthenticateResponse,
-  },
   queue: {
     path: '/MatchMaking/Queue',
     requestStream: true,

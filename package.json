@@ -6,6 +6,7 @@
   "author": "Meachamp <34523297+Meachamp@users.noreply.github.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/google-protobuf": "^3.7.4",
     "@types/jest": "26.0.20",
     "@typescript-eslint/eslint-plugin": "4.14.2",
     "@typescript-eslint/parser": "4.14.2",

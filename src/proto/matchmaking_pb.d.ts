@@ -154,7 +154,7 @@ export namespace MatchParameters {
 
     export enum MatchStatus {
     OK = 0,
-    ERR_NONEXISTANT = 1,
+    ERR_NONEXISTENT = 1,
     }
 
 }

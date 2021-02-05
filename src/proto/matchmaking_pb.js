@@ -934,7 +934,7 @@ proto.MatchParameters.serializeBinaryToWriter = function(message, writer) {
  */
 proto.MatchParameters.MatchStatus = {
   OK: 0,
-  ERR_NONEXISTANT: 1
+  ERR_NONEXISTENT: 1
 };
 
 /**

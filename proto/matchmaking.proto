@@ -43,7 +43,7 @@ message MatchParametersRequest {
 message MatchParameters {
     enum MatchStatus {
         OK = 0;
-        ERR_NONEXISTANT = 1;
+        ERR_NONEXISTENT = 1;
     }
 
     MatchStatus status = 1;

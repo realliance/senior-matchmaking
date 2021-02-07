@@ -1038,7 +1038,8 @@ proto.MatchingState = {
   STATE_LOOKING: 0,
   STATE_CONFIRMING: 1,
   STATE_INGAME: 2,
-  STATE_IDLE: 3
+  STATE_IDLE: 3,
+  STATE_CONFIRMED: 4
 };
 
 goog.object.extend(exports, proto);

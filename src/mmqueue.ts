@@ -2,7 +2,7 @@ import {ConfirmResponse, MatchParameters, MMQClientUpdate, MMQServerUpdate, Stat
 import {Player} from './mmplayer'
 import { PlayerChannel } from './mmchannel';
 
-enum MatchingState {
+export enum MatchingState {
     STATE_LOOKING,
     STATE_CONFIRMING,
     STATE_INGAME,
@@ -87,6 +87,19 @@ export class MatchMakingQueue {
             default:
                 break
         }
+    }
+
+    removeFromQueue(ply: Player) : boolean {
+        let idx: number = this.queue.findIndex((el) => {
+            return el.ply.uid === ply.uid
+        })
+
+        if(idx !== -1) {
+            this.queue.splice(idx, 1);
+            return true
+        }
+
+        return false
     }
 
     onPlayerDisconnect(ply: Player) : void {

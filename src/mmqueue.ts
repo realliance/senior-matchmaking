@@ -59,6 +59,12 @@ export class MatchMakingQueue {
             let info: PlayerInfo = this.getPlayerInfo(ply);
             if(info.matchState == MatchingState.STATE_CONFIRMED) {
                 this.updatePlayerState(ply, MatchingState.STATE_LOOKING)
+
+                //Put the player back in the queue
+                this.queue.unshift({
+                    ply: ply,
+                    entryTime: Date.now()/1000
+                })
             } else if(info.matchState == MatchingState.STATE_CONFIRMING) {
                 this.updatePlayerState(ply, MatchingState.STATE_IDLE)
             } else {
@@ -70,6 +76,14 @@ export class MatchMakingQueue {
 
         if(match.confirmTimer !== null)
             clearTimeout(match.confirmTimer)
+    }
+
+    async checkMatchReadiness(match: Match) {
+        //If every player has confirmed
+        if(match.players.every((ply:Player) => this.getPlayerInfo(ply).matchState == MatchingState.STATE_CONFIRMED)) {
+            //Time to spin up a server here
+
+        }
     }
 
     //serveQueue
@@ -96,6 +110,9 @@ export class MatchMakingQueue {
         //Setup a timer to timeout the match queue
         //This timer will be cancelled if everyone confirms
         match.confirmTimer = setTimeout(() => {
+            //Invalidate the timer
+            match.confirmTimer = null
+
             let unconfirmedPlayers: Player[] = match.players.filter((ply:Player) => this.getPlayerInfo(ply).matchState != MatchingState.STATE_CONFIRMED)
 
             //Match needs to be cancelled
@@ -126,12 +143,12 @@ export class MatchMakingQueue {
         switch(info.matchState) {
             case MatchingState.STATE_CONFIRMING:
             {
-                this.removeFromQueue(ply)
+                this.cancelMatch(this.playerToMatch[ply.uid], [ply])
                 break;
             }
             case MatchingState.STATE_LOOKING:
             {
-                this.cancelMatch(this.playerToMatch[ply.uid], [ply])
+                this.removeFromQueue(ply)
                 break;
             }
             default:
@@ -174,8 +191,17 @@ export class MatchMakingQueue {
     }
 
     onPlayerConfirm(ply: Player) : ConfirmResponse {
+        let info: PlayerInfo = this.getPlayerInfo(ply)
         let res: ConfirmResponse = new ConfirmResponse()
-        res.setStatus(Status.STATUS_OK)
+
+        if(info.matchState == MatchingState.STATE_CONFIRMING) {
+            this.updatePlayerState(ply, MatchingState.STATE_CONFIRMED)
+            this.checkMatchReadiness(this.playerToMatch[ply.uid])
+            res.setStatus(Status.STATUS_OK)
+        } else {
+            res.setStatus(Status.STATUS_ERR)
+        }
+
         return res
     }
 

@@ -62,14 +62,10 @@ export namespace MMQServerUpdate {
     }
 
     export enum QueueUpdate {
-    STATUS_CANCELLED_SOFT = 0,
-    STATUS_CANCELLED_HARD = 1,
-    STATUS_PENDING_CONFIRMATION = 2,
-    STATUS_QUEUE_UPDATE = 3,
-    STATUS_MATCH_FOUND = 4,
-    STATUS_RECONNECT = 5,
-    STATUS_ACK = 6,
-    STATUS_STATEUPDATE = 7,
+    STATUS_QUEUE_UPDATE = 0,
+    STATUS_RECONNECT = 1,
+    STATUS_ACK = 2,
+    STATUS_STATEUPDATE = 3,
     }
 
 }

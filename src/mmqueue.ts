@@ -54,8 +54,22 @@ export class MatchMakingQueue {
         info.channel.write(upd);
     }
 
-    cancelMatch(match: Match) : void {
+    cancelMatch(match: Match, playersToKick: Player[]) : void {
+        match.players.forEach((ply: Player) => {
+            let info: PlayerInfo = this.getPlayerInfo(ply);
+            if(info.matchState == MatchingState.STATE_CONFIRMED) {
+                this.updatePlayerState(ply, MatchingState.STATE_LOOKING)
+            } else if(info.matchState == MatchingState.STATE_CONFIRMING) {
+                this.updatePlayerState(ply, MatchingState.STATE_IDLE)
+            } else {
+                throw "Player in an invalid state!"
+            }
 
+            delete this.playerToMatch[ply.uid]
+        })
+
+        if(match.confirmTimer !== null)
+            clearTimeout(match.confirmTimer)
     }
 
     //serveQueue
@@ -86,7 +100,7 @@ export class MatchMakingQueue {
 
             //Match needs to be cancelled
             if(unconfirmedPlayers.length > 0)
-                this.cancelMatch(match)
+                this.cancelMatch(match, unconfirmedPlayers)
         }, this.config.confirmTimeout * 1000)
 
         return true;
@@ -112,13 +126,16 @@ export class MatchMakingQueue {
         switch(info.matchState) {
             case MatchingState.STATE_CONFIRMING:
             {
+                this.removeFromQueue(ply)
                 break;
             }
             case MatchingState.STATE_LOOKING:
             {
+                this.cancelMatch(this.playerToMatch[ply.uid], [ply])
                 break;
             }
-
+            default:
+                break;
         }
     }
 
@@ -153,12 +170,7 @@ export class MatchMakingQueue {
     }
 
     onPlayerDisconnect(ply: Player) : void {
-        let info: PlayerInfo = this.getPlayerInfo(ply)
-
-        // Player needs to be pulled from the queue
-        if(info.matchState == MatchingState.STATE_LOOKING) {
-
-        }
+        this.handleLeave(ply)
     }
 
     onPlayerConfirm(ply: Player) : ConfirmResponse {

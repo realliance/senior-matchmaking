@@ -1,6 +1,6 @@
 import { Player } from '../mmplayer';
-import {MatchingState, MatchMakingQueue} from '../mmqueue'
-import { MMQClientUpdate } from '../proto/matchmaking_pb';
+import {MatchMakingQueue} from '../mmqueue'
+import { MatchingState, MMQClientUpdate } from '../proto/matchmaking_pb';
 
 let queue: MatchMakingQueue = new MatchMakingQueue();
 let ply: Player = {uid:0};

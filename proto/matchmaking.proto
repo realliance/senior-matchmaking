@@ -5,6 +5,13 @@ enum Status {
     STATUS_ERR = 1;
 }
 
+enum MatchingState {
+    STATE_LOOKING = 0;
+    STATE_CONFIRMING = 1;
+    STATE_INGAME = 2;
+    STATE_IDLE = 3;
+}
+
 message MMQClientUpdate {
     enum QueueOperation {
         OP_JOIN = 0;
@@ -23,10 +30,12 @@ message MMQServerUpdate {
         STATUS_MATCH_FOUND = 4; //A match has been found, client must query GetMatchParameters for server info
         STATUS_RECONNECT = 5; //A match is already in progress for this client. Query GetMatchParameters and reconnect.
         STATUS_ACK = 6; //Client has joined queue
+        STATUS_STATEUPDATE = 7;
     }
 
     QueueUpdate status = 1;
     uint32 est_queue_time = 2;
+    MatchingState queue_state = 3;
 }
 
 message ConfirmRequest {

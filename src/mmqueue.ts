@@ -88,7 +88,7 @@ export class MatchMakingQueue {
             clearTimeout(match.confirmTimer)
     }
 
-    async checkMatchReadiness(match: Match) : Promise<boolean> {
+    async initMatchIfReady(match: Match) : Promise<boolean> {
         //If every player has confirmed
         if(match.players.every((ply:Player) => this.getPlayerInfo(ply).matchState == MatchingState.STATE_CONFIRMED)) {
             //Time to spin up a server here
@@ -97,6 +97,10 @@ export class MatchMakingQueue {
             match.players.forEach((ply: Player) => {
                 this.updatePlayerState(ply, MatchingState.STATE_INGAME)
             })
+
+            //Cancel the timeout
+            if(match.confirmTimer !== null)
+                clearTimeout(match.confirmTimer)
 
             return true
         }
@@ -214,7 +218,7 @@ export class MatchMakingQueue {
 
         if(info.matchState == MatchingState.STATE_CONFIRMING) {
             this.updatePlayerState(ply, MatchingState.STATE_CONFIRMED)
-            this.checkMatchReadiness(this.playerToMatch[ply.uid])
+            this.initMatchIfReady(this.playerToMatch[ply.uid])
             res.setStatus(Status.STATUS_OK)
         } else {
             res.setStatus(Status.STATUS_ERR)

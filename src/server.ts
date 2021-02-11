@@ -4,7 +4,7 @@ import {MatchMakingServer} from './mmserver'
 const server = new grpc.Server()
 
 server.addService(MatchMakingService, new MatchMakingServer())
-server.bindAsync("0.0.0.0:4000", grpc.ServerCredentials.createInsecure(), (error: Error | null, port: number) => {
+server.bindAsync("0.0.0.0:4000", grpc.ServerCredentials.createInsecure(), (error: Error | null) => {
     if(error)
         throw error
     server.start()

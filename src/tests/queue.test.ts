@@ -1,6 +1,6 @@
-import { Player } from '../mmplayer';
+import {Player} from '../mmplayer';
 import {MatchMakingQueue} from '../mmqueue'
-import { ConfirmResponse, MatchingState, MMQClientUpdate, Status } from '../proto/matchmaking_pb';
+import {MatchingState, MMQClientUpdate, Status } from '../proto/matchmaking_pb';
 
 process.on('unhandledRejection', console.warn)
 
@@ -191,7 +191,7 @@ describe('Matchmaking functionality', () => {
         })
 
         //Wait for the confirmation timeout to expire
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve) => {
             setTimeout(resolve, 100)
         })
 

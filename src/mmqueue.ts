@@ -15,7 +15,7 @@ interface PlayerInfo {
 
 class MatchConfig {
     numPlayers = 8;
-    confirmTimeout = 12;
+    confirmTimeout = 12*1000;
 }
 
 interface MatchRecord {
@@ -147,7 +147,7 @@ export class MatchMakingQueue {
             //Match needs to be cancelled
             if(unconfirmedPlayers.length > 0)
                 this.cancelMatch(match, unconfirmedPlayers)
-        }, this.config.confirmTimeout * 1000)
+        }, this.config.confirmTimeout)
 
 
 

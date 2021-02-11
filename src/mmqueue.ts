@@ -127,6 +127,9 @@ export class MatchMakingQueue {
         entries.forEach((qe: QueueEntry) => {
             //Mark all players as confirming
             this.updatePlayerState(qe.ply, MatchingState.STATE_CONFIRMING)
+
+            //Mark each player as belonging to this match
+            this.playerToMatch[qe.ply.uid] = match
         })
 
         //Setup a timer to timeout the match queue
@@ -141,6 +144,8 @@ export class MatchMakingQueue {
             if(unconfirmedPlayers.length > 0)
                 this.cancelMatch(match, unconfirmedPlayers)
         }, this.config.confirmTimeout * 1000)
+
+
 
         return true;
     }
@@ -176,6 +181,8 @@ export class MatchMakingQueue {
             default:
                 break;
         }
+
+        delete this.players[ply.uid]
     }
 
     onPlayerUpdate(req: MMQClientUpdate, ply: Player) : void {

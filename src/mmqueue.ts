@@ -17,9 +17,15 @@ class MatchConfig {
     confirmTimeout = 12;
 }
 
+interface MatchRecord {
+    ip: string;
+    port: number;
+}
+
 class Match {
     players: Player[];
     confirmTimer: NodeJS.Timeout|null = null;
+    parameters: MatchRecord|null = null;
 
     constructor(ql: QueueEntry[]) {
         this.players = ql.map((el: QueueEntry) => el.ply)
@@ -34,6 +40,10 @@ export class MatchMakingQueue {
 
     getPlayerInfo(ply: Player) : PlayerInfo {
         return this.players[ply.uid];
+    }
+
+    getPlayerMatch(ply: Player) : Match|undefined {
+        return this.playerToMatch[ply.uid]
     }
 
     onPlayerConnected(ply: Player, channel: PlayerChannel) : void {
@@ -215,6 +225,15 @@ export class MatchMakingQueue {
 
     onPlayerRequestMatchParams(ply: Player) : MatchParameters {
         const res: MatchParameters = new MatchParameters()
+        const match = this.getPlayerMatch(ply)
+
+        if(match?.parameters) {
+            res.setStatus(MatchParameters.MatchStatus.OK)
+            res.setIp(match.parameters.ip)
+            res.setPort(match.parameters.port)
+        } else {
+            res.setStatus(MatchParameters.MatchStatus.ERR_NONEXISTENT)
+        }
         return res
     }
 }

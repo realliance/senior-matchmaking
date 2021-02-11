@@ -15,7 +15,7 @@ function getTestChannel() {
 }
 
 function getOpJoinUpdate() {
-    let upd: MMQClientUpdate = new MMQClientUpdate();
+    const upd: MMQClientUpdate = new MMQClientUpdate();
     upd.setRequestedoperation(MMQClientUpdate.QueueOperation.OP_JOIN)
     return upd
 }

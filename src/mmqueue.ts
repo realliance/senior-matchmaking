@@ -13,8 +13,8 @@ interface PlayerInfo {
 }
 
 class MatchConfig {
-    numPlayers: number = 8;
-    confirmTimeout: number = 12;
+    numPlayers = 8;
+    confirmTimeout = 12;
 }
 
 class Match {
@@ -43,7 +43,7 @@ export class MatchMakingQueue {
         }
     }
 
-    updatePlayerState(ply: Player, state: MatchingState) {
+    updatePlayerState(ply: Player, state: MatchingState) : void {
         let info: PlayerInfo = this.getPlayerInfo(ply)
         info.matchState = state
 
@@ -83,6 +83,10 @@ export class MatchMakingQueue {
         if(match.players.every((ply:Player) => this.getPlayerInfo(ply).matchState == MatchingState.STATE_CONFIRMED)) {
             //Time to spin up a server here
 
+            //Mark players as IN_GAME, at this point match parameters can be retreived
+            match.players.forEach((ply: Player) => {
+                this.updatePlayerState(ply, MatchingState.STATE_INGAME)
+            })
         }
     }
 

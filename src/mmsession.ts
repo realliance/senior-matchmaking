@@ -7,11 +7,11 @@ export class MatchMakingSessions {
         this._sessions = {}
     }
 
-    createSession(token: string, ply: Player) {
+    createSession(token: string, ply: Player) : void {
         this._sessions[token] = ply;
     }
 
-    hasSession(token: string) {
+    hasSession(token: string) : boolean {
         return this._sessions[token] != undefined
     }
 }

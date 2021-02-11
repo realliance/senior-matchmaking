@@ -44,10 +44,10 @@ export class MatchMakingQueue {
     }
 
     updatePlayerState(ply: Player, state: MatchingState) : void {
-        let info: PlayerInfo = this.getPlayerInfo(ply)
+        const info: PlayerInfo = this.getPlayerInfo(ply)
         info.matchState = state
 
-        let upd: MMQServerUpdate = new MMQServerUpdate();
+        const upd: MMQServerUpdate = new MMQServerUpdate();
         upd.setStatus(MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE);
         upd.setQueueState(info.matchState);
 
@@ -56,8 +56,8 @@ export class MatchMakingQueue {
 
     cancelMatch(match: Match, playersToKick: Player[]) : void {
         match.players.forEach((ply: Player) => {
-            let info: PlayerInfo = this.getPlayerInfo(ply);
-            if(info.matchState == MatchingState.STATE_CONFIRMED) {
+            const info: PlayerInfo = this.getPlayerInfo(ply);
+            if(playersToKick.includes(ply)) {
                 this.updatePlayerState(ply, MatchingState.STATE_LOOKING)
 
                 //Put the player back in the queue
@@ -65,10 +65,10 @@ export class MatchMakingQueue {
                     ply: ply,
                     entryTime: Date.now()/1000
                 })
-            } else if(info.matchState == MatchingState.STATE_CONFIRMING) {
+            } else if(info.matchState == MatchingState.STATE_CONFIRMING || info.matchState == MatchingState.STATE_CONFIRMED) {
                 this.updatePlayerState(ply, MatchingState.STATE_IDLE)
             } else {
-                throw "Player in an invalid state!"
+                throw "Player in invalid state: " + info.matchState.toString()
             }
 
             delete this.playerToMatch[ply.uid]
@@ -78,7 +78,7 @@ export class MatchMakingQueue {
             clearTimeout(match.confirmTimer)
     }
 
-    async checkMatchReadiness(match: Match) {
+    async checkMatchReadiness(match: Match) : Promise<boolean> {
         //If every player has confirmed
         if(match.players.every((ply:Player) => this.getPlayerInfo(ply).matchState == MatchingState.STATE_CONFIRMED)) {
             //Time to spin up a server here
@@ -87,7 +87,11 @@ export class MatchMakingQueue {
             match.players.forEach((ply: Player) => {
                 this.updatePlayerState(ply, MatchingState.STATE_INGAME)
             })
+
+            return true
         }
+
+        return false
     }
 
     //serveQueue
@@ -101,10 +105,10 @@ export class MatchMakingQueue {
         if(this.queue.length < this.config.numPlayers)
             return false;
 
-        let entries: QueueEntry[] = this.queue.splice(0, this.config.numPlayers);
+        const entries: QueueEntry[] = this.queue.splice(0, this.config.numPlayers);
 
         //Construct a new match
-        let match: Match = new Match(entries)
+        const match: Match = new Match(entries)
 
         entries.forEach((qe: QueueEntry) => {
             //Mark all players as confirming
@@ -117,7 +121,7 @@ export class MatchMakingQueue {
             //Invalidate the timer
             match.confirmTimer = null
 
-            let unconfirmedPlayers: Player[] = match.players.filter((ply:Player) => this.getPlayerInfo(ply).matchState != MatchingState.STATE_CONFIRMED)
+            const unconfirmedPlayers: Player[] = match.players.filter((ply:Player) => this.getPlayerInfo(ply).matchState != MatchingState.STATE_CONFIRMED)
 
             //Match needs to be cancelled
             if(unconfirmedPlayers.length > 0)
@@ -128,7 +132,7 @@ export class MatchMakingQueue {
     }
 
     handleJoin(ply: Player) : void {
-        let info: PlayerInfo = this.getPlayerInfo(ply)
+        const info: PlayerInfo = this.getPlayerInfo(ply)
 
         // Player can enter the queue
         if(info.matchState == MatchingState.STATE_IDLE) {
@@ -141,7 +145,7 @@ export class MatchMakingQueue {
     }
 
     handleLeave(ply: Player) : void {
-        let info: PlayerInfo = this.getPlayerInfo(ply)
+        const info: PlayerInfo = this.getPlayerInfo(ply)
 
         //Player can only leave during the confirmation phase and searching
         switch(info.matchState) {
@@ -178,7 +182,7 @@ export class MatchMakingQueue {
     }
 
     removeFromQueue(ply: Player) : boolean {
-        let idx: number = this.queue.findIndex((el) => {
+        const idx: number = this.queue.findIndex((el) => {
             return el.ply.uid === ply.uid
         })
 
@@ -195,8 +199,8 @@ export class MatchMakingQueue {
     }
 
     onPlayerConfirm(ply: Player) : ConfirmResponse {
-        let info: PlayerInfo = this.getPlayerInfo(ply)
-        let res: ConfirmResponse = new ConfirmResponse()
+        const info: PlayerInfo = this.getPlayerInfo(ply)
+        const res: ConfirmResponse = new ConfirmResponse()
 
         if(info.matchState == MatchingState.STATE_CONFIRMING) {
             this.updatePlayerState(ply, MatchingState.STATE_CONFIRMED)
@@ -210,7 +214,7 @@ export class MatchMakingQueue {
     }
 
     onPlayerRequestMatchParams(ply: Player) : MatchParameters {
-        let res: MatchParameters = new MatchParameters()
+        const res: MatchParameters = new MatchParameters()
         return res
     }
 }

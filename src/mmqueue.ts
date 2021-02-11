@@ -99,8 +99,10 @@ export class MatchMakingQueue {
             })
 
             //Cancel the timeout
-            if(match.confirmTimer !== null)
+            if(match.confirmTimer !== null) {
                 clearTimeout(match.confirmTimer)
+                match.confirmTimer = null
+            }
 
             return true
         }

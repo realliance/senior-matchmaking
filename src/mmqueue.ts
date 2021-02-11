@@ -1,6 +1,7 @@
 import {ConfirmResponse, MatchParameters, MMQClientUpdate, MMQServerUpdate, Status, MatchingState} from './proto/matchmaking_pb'
 import {Player} from './mmplayer'
 import { PlayerChannel } from './mmchannel';
+import assert from 'assert';
 
 interface QueueEntry {
     ply: Player;
@@ -67,7 +68,8 @@ export class MatchMakingQueue {
     cancelMatch(match: Match, playersToKick: Player[]) : void {
         match.players.forEach((ply: Player) => {
             const info: PlayerInfo = this.getPlayerInfo(ply);
-            if(playersToKick.includes(ply)) {
+            if(!playersToKick.includes(ply)) {
+                assert(info.matchState == MatchingState.STATE_CONFIRMED || info.matchState == MatchingState.STATE_CONFIRMING)
                 this.updatePlayerState(ply, MatchingState.STATE_LOOKING)
 
                 //Put the player back in the queue
@@ -183,8 +185,6 @@ export class MatchMakingQueue {
             default:
                 break;
         }
-
-        delete this.players[ply.uid]
     }
 
     onPlayerUpdate(req: MMQClientUpdate, ply: Player) : void {
@@ -210,7 +210,9 @@ export class MatchMakingQueue {
         })
 
         if(idx !== -1) {
+            assert(this.getPlayerInfo(ply).matchState == MatchingState.STATE_LOOKING)
             this.queue.splice(idx, 1);
+            this.getPlayerInfo(ply).matchState = MatchingState.STATE_IDLE
             return true
         }
 
@@ -219,6 +221,7 @@ export class MatchMakingQueue {
 
     onPlayerDisconnect(ply: Player) : void {
         this.handleLeave(ply)
+        delete this.players[ply.uid]
     }
 
     onPlayerConfirm(ply: Player) : ConfirmResponse {

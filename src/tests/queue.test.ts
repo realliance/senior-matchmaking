@@ -28,7 +28,7 @@ const getOpExitUpdate = (): MMQClientUpdate => {
 };
 
 const getTestPlayers = (numberOfPlayers: number, start = 0): Player[] => {
-    const plys: Player[] = [...Array(numberOfPlayers).keys()].map((val) => ({ uid: val + start }));
+    const plys: Player[] = [...Array(numberOfPlayers).keys()].map((val) => ({ uid: `${(val + start)}`}));
     return plys;
 };
 
@@ -47,27 +47,27 @@ const buildMMQObject = (state: MatchingState, status: MMQServerUpdate.QueueUpdat
 
 describe('Single-player queue correctness', () => {
     test('Player is stored on connection', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
         queue.onPlayerConnected(ply, getTestChannel());
         expect(queue.players[ply.uid]).toBeTruthy();
         expect(queue.getPlayerInfo(ply)).toBeTruthy();
     });
 
     test('Player initially has STATE_IDLE', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
         queue.onPlayerConnected(ply, getTestChannel());
         expect(queue.getPlayerInfo(ply).matchState).toBe(MatchingState.STATE_IDLE);
     });
 
     test('OP_JOIN joins a player to the queue', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.queue.length).toBe(1);
     });
 
     test('Player can be removed from queue', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.queue.length).toBe(1);
@@ -81,7 +81,7 @@ describe('Single-player queue correctness', () => {
     });
 
     test('Player can leave queue', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.queue.length).toBe(1);
@@ -91,7 +91,7 @@ describe('Single-player queue correctness', () => {
     });
 
     test('Player is cleaned up after disconnecting', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.players[ply.uid]).toBeTruthy();
@@ -103,7 +103,7 @@ describe('Single-player queue correctness', () => {
     });
 
     test('Correct player state after issuing OP_EXIT', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
 
@@ -114,7 +114,7 @@ describe('Single-player queue correctness', () => {
     });
 
     test('STATE_IDLE update is dispatched on connection', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: "0" };
 
         const writeMock : jest.Mock<boolean, [MMQServerUpdate]> = jest.fn().mockReturnValue(true);
         const endMock : jest.Mock<boolean, [void]> = jest.fn().mockReturnValue(true);

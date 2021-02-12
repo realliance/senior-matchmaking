@@ -1,5 +1,5 @@
 export interface Player {
-    uid: number;
+    uid: string;
 }
 
-export const getPlayerInfo = async (token: string) : Promise<Player> => ({ uid: 0 });
+export const getPlayerInfo = async (token: string) : Promise<Player> => ({ uid: "0" });

@@ -39,11 +39,11 @@ class Match {
 }
 
 export class MatchMakingQueue {
-    players: Record<number, PlayerInfo> = {};
+    players: Record<string, PlayerInfo> = {};
 
     queue: Array<QueueEntry> = [];
 
-    playerToMatch: Record<number, Match> = {};
+    playerToMatch: Record<string, Match> = {};
 
     config: MatchConfig = new MatchConfig();
 

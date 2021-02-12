@@ -8,6 +8,8 @@ beforeEach(() => {
     queue = new MatchMakingQueue();
 });
 
+jest.useFakeTimers()
+
 const getTestChannel = () => ({ write: () => true, end: () => null });
 
 const getOpJoinUpdate = (): MMQClientUpdate => {
@@ -178,7 +180,7 @@ describe('Matchmaking functionality', () => {
 
     test('Match cancelled if confirmation stage times out', async () => {
         // Lower confirmation timeout
-        queue.config.confirmTimeout = 50;
+        queue.config.confirmTimeout = 10000;
 
         const plys: Player[] = getTestPlayers(8);
         plys.forEach((ply) => queue.onPlayerConnected(ply, getTestChannel()));
@@ -192,9 +194,7 @@ describe('Matchmaking functionality', () => {
         });
 
         // Wait for the confirmation timeout to expire
-        await new Promise((resolve) => {
-            setTimeout(resolve, 100);
-        });
+        jest.advanceTimersByTime(10000)
 
         // All 8 players should be present in the player roster
         expect(Object.keys(queue.players).length).toBe(8);

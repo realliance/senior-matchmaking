@@ -4,38 +4,11 @@ import {
 } from './proto/matchmaking_pb';
 import { Player } from './mmplayer';
 import { PlayerChannel } from './mmchannel';
-
-interface QueueEntry {
-    ply: Player;
-    entryTime: number;
-}
+import { Match, QueueEntry, MatchConfig } from './mmmatch';
 
 interface PlayerInfo {
     matchState: MatchingState;
     channel: PlayerChannel;
-}
-
-class MatchConfig {
-    numPlayers = 8;
-
-    confirmTimeout = 12 * 1000;
-}
-
-interface MatchRecord {
-    ip: string;
-    port: number;
-}
-
-class Match {
-    players: Player[];
-
-    confirmTimer: NodeJS.Timeout|null = null;
-
-    parameters: MatchRecord|null = null;
-
-    constructor(ql: QueueEntry[]) {
-        this.players = ql.map((el: QueueEntry) => el.ply);
-    }
 }
 
 export class MatchMakingQueue {

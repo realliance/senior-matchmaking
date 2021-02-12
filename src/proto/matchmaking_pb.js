@@ -430,9 +430,7 @@ proto.MMQServerUpdate.serializeBinaryToWriter = function(message, writer) {
  */
 proto.MMQServerUpdate.QueueUpdate = {
   STATUS_QUEUE_UPDATE: 0,
-  STATUS_RECONNECT: 1,
-  STATUS_ACK: 2,
-  STATUS_STATEUPDATE: 3
+  STATUS_STATEUPDATE: 1
 };
 
 /**

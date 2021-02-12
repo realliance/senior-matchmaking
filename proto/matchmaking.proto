@@ -25,9 +25,7 @@ message MMQClientUpdate {
 message MMQServerUpdate {
     enum QueueUpdate {
         STATUS_QUEUE_UPDATE = 0; //Server updated queue parameters
-        STATUS_RECONNECT = 1; //A match is already in progress for this client. Query GetMatchParameters and reconnect.
-        STATUS_ACK = 2; //Client has joined queue
-        STATUS_STATEUPDATE = 3;
+        STATUS_STATEUPDATE = 1; // Server updated client state
     }
 
     QueueUpdate status = 1;

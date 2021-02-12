@@ -62,7 +62,7 @@ export class MatchMakingQueue {
         };
 
         // Player has disconnected but is still in a match, so we give the opportunity to reconnect.
-        if(this.playerToMatch[ply.uid]) {
+        if (this.playerToMatch[ply.uid]) {
             this.players[ply.uid].matchState = MatchingState.STATE_INGAME;
         }
 

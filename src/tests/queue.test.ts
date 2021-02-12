@@ -122,7 +122,7 @@ describe('Single-player queue correctness', () => {
         queue.onPlayerConnected(ply, channel);
         expect(writeMock).toBeCalled();
         expect(writeMock.mock.calls[0][0])
-        .toMatchObject(buildMMQObject(MatchingState.STATE_IDLE, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
+            .toMatchObject(buildMMQObject(MatchingState.STATE_IDLE, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
     });
 });
 
@@ -248,15 +248,15 @@ describe('Matchmaking functionality', () => {
         });
 
         expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
-        queue.onPlayerDisconnect(plys[0])
+        queue.onPlayerDisconnect(plys[0]);
 
         const writeMock : jest.Mock<boolean, [MMQServerUpdate]> = jest.fn().mockReturnValue(true);
         const endMock : jest.Mock<boolean, [void]> = jest.fn().mockReturnValue(true);
         const channel: PlayerChannel = { write: writeMock, end: endMock };
-        queue.onPlayerConnected(plys[0], channel)
+        queue.onPlayerConnected(plys[0], channel);
 
-        expect(writeMock).toHaveBeenCalledTimes(1)
+        expect(writeMock).toHaveBeenCalledTimes(1);
         expect(writeMock.mock.calls[0][0])
-        .toMatchObject(buildMMQObject(MatchingState.STATE_INGAME, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
+            .toMatchObject(buildMMQObject(MatchingState.STATE_INGAME, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
     });
 });

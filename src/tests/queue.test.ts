@@ -121,7 +121,8 @@ describe('Single-player queue correctness', () => {
         const channel: PlayerChannel = { write: writeMock, end: endMock };
         queue.onPlayerConnected(ply, channel);
         expect(writeMock).toBeCalled();
-        expect(writeMock.mock.calls[0][0]).toMatchObject(buildMMQObject(MatchingState.STATE_IDLE, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
+        expect(writeMock.mock.calls[0][0])
+        .toMatchObject(buildMMQObject(MatchingState.STATE_IDLE, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
     });
 });
 
@@ -229,5 +230,33 @@ describe('Matchmaking functionality', () => {
         // Remaining players should have the proper state
         expectPlayersAreInState(plys.slice(2, 8), MatchingState.STATE_LOOKING);
         expectPlayersAreInState(plys.slice(0, 2), MatchingState.STATE_IDLE);
+    });
+
+    test('Player returns to STATE_INGAME after reconnecting', () => {
+        const plys: Player[] = getTestPlayers(8);
+        plys.forEach((ply) => queue.onPlayerConnected(ply, getTestChannel()));
+        expect(queue.serveQueue()).toBeFalsy();
+        expectPlayersAreInState(plys, MatchingState.STATE_IDLE);
+
+        plys.forEach((ply) => queue.onPlayerUpdate(getOpJoinUpdate(), ply));
+        expectPlayersAreInState(plys, MatchingState.STATE_LOOKING);
+        expect(queue.serveQueue()).toBeTruthy();
+        expectPlayersAreInState(plys, MatchingState.STATE_CONFIRMING);
+
+        plys.forEach((ply) => {
+            expect(queue.onPlayerConfirm(ply).getStatus()).toBe(Status.STATUS_OK);
+        });
+
+        expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
+        queue.onPlayerDisconnect(plys[0])
+
+        const writeMock : jest.Mock<boolean, [MMQServerUpdate]> = jest.fn().mockReturnValue(true);
+        const endMock : jest.Mock<boolean, [void]> = jest.fn().mockReturnValue(true);
+        const channel: PlayerChannel = { write: writeMock, end: endMock };
+        queue.onPlayerConnected(plys[0], channel)
+
+        expect(writeMock).toHaveBeenCalledTimes(1)
+        expect(writeMock.mock.calls[0][0])
+        .toMatchObject(buildMMQObject(MatchingState.STATE_INGAME, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
     });
 });

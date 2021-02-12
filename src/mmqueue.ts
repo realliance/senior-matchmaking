@@ -4,7 +4,7 @@ import {
 } from './proto/matchmaking_pb';
 import { Player } from './mmplayer';
 import { PlayerChannel } from './mmchannel';
-import { Match, QueueEntry, MatchConfig } from './mmmatch';
+import { Match, QueueEntry, MatchConfig, PlayerUID } from './mmmatch';
 
 interface PlayerInfo {
     matchState: MatchingState;
@@ -12,11 +12,11 @@ interface PlayerInfo {
 }
 
 export class MatchMakingQueue {
-    players: Record<string, PlayerInfo> = {};
+    players: Record<PlayerUID, PlayerInfo> = {};
 
     queue: Array<QueueEntry> = [];
 
-    playerToMatch: Record<string, Match> = {};
+    playerToMatch: Record<PlayerUID, Match> = {};
 
     config: MatchConfig = new MatchConfig();
 

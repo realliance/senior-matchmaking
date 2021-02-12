@@ -1,6 +1,9 @@
+import { PlayerChannel } from '../mmchannel';
 import { Player } from '../mmplayer';
 import { MatchMakingQueue } from '../mmqueue';
-import { MatchingState, MMQClientUpdate, Status } from '../proto/matchmaking_pb';
+import {
+    MatchingState, MMQClientUpdate, MMQServerUpdate, Status,
+} from '../proto/matchmaking_pb';
 
 let queue: MatchMakingQueue = new MatchMakingQueue();
 
@@ -8,9 +11,9 @@ beforeEach(() => {
     queue = new MatchMakingQueue();
 });
 
-jest.useFakeTimers()
+jest.useFakeTimers();
 
-const getTestChannel = () => ({ write: () => true, end: () => null });
+const getTestChannel = () : PlayerChannel => ({ write: () => true, end: () => null });
 
 const getOpJoinUpdate = (): MMQClientUpdate => {
     const upd: MMQClientUpdate = new MMQClientUpdate();
@@ -33,6 +36,13 @@ const expectPlayersAreInState = (plys: Player[], state: MatchingState) : void =>
     plys.forEach((ply) => {
         expect(queue.getPlayerInfo(ply).matchState).toBe(state);
     });
+};
+
+const buildMMQObject = (state: MatchingState, status: MMQServerUpdate.QueueUpdate) : MMQServerUpdate => {
+    const upd: MMQServerUpdate = new MMQServerUpdate();
+    upd.setStatus(status);
+    upd.setQueueState(state);
+    return upd;
 };
 
 describe('Single-player queue correctness', () => {
@@ -101,6 +111,17 @@ describe('Single-player queue correctness', () => {
         expect(queue.queue.length).toBe(0);
         expectPlayersAreInState([ply], MatchingState.STATE_IDLE);
         expect(queue.players[ply.uid]).toBeTruthy();
+    });
+
+    test('STATE_IDLE update is dispatched on connection', () => {
+        const ply: Player = { uid: 0 };
+
+        const writeMock : jest.Mock<boolean, [MMQServerUpdate]> = jest.fn().mockReturnValue(true);
+        const endMock : jest.Mock<boolean, [void]> = jest.fn().mockReturnValue(true);
+        const channel: PlayerChannel = { write: writeMock, end: endMock };
+        queue.onPlayerConnected(ply, channel);
+        expect(writeMock).toBeCalled();
+        expect(writeMock.mock.calls[0][0]).toMatchObject(buildMMQObject(MatchingState.STATE_IDLE, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
     });
 });
 
@@ -194,7 +215,7 @@ describe('Matchmaking functionality', () => {
         });
 
         // Wait for the confirmation timeout to expire
-        jest.advanceTimersByTime(10000)
+        jest.advanceTimersByTime(10000);
 
         // All 8 players should be present in the player roster
         expect(Object.keys(queue.players).length).toBe(8);

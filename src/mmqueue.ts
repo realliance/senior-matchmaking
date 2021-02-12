@@ -60,7 +60,7 @@ export class MatchMakingQueue {
             matchState: MatchingState.STATE_IDLE,
             channel,
         };
-        this.updatePlayerState(ply, this.players[ply.uid].matchState)
+        this.updatePlayerState(ply, this.players[ply.uid].matchState);
     }
 
     updatePlayerState(ply: Player, state: MatchingState) : void {

@@ -2627,6 +2627,11 @@ google-protobuf@3.12.4:
   resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.12.4.tgz#fd89b7e5052cdb35a80f9b455612851d542a5c9f"
   integrity sha512-ItTn8YepDQMHEMHloUPH+FDaTPiHTnbsMvP50aXfbI65IK3AA5+wXlHSygJH8xz+h1g4gu7V+CK5X1/SaGITsA==
 
+google-protobuf@^3.15.0-rc.1:
+  version "3.15.0-rc.1"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.15.0-rc.1.tgz#f60b5c53389109bb7964e53d2b1e0a19155c5cd0"
+  integrity sha512-aDpp0vaiFaM9Thv5H0UC2FJ3x4XzBABM1v+Q5V5GGyTNd1VsZXjKTPdI0ObFgio2tpBWO7nFy2cQmJ9n+6n95A==
+
 graceful-fs@^4.1.2, graceful-fs@^4.2.4:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"

@@ -12,28 +12,28 @@ beforeEach(() => {
     ply = {uid: 0};
 })
 
-function getTestChannel() {
+const getTestChannel = () => {
     return {write: () => true, end: () => null}
 }
 
-function getOpJoinUpdate(): MMQClientUpdate {
+const getOpJoinUpdate = (): MMQClientUpdate => {
     const upd: MMQClientUpdate = new MMQClientUpdate();
     upd.setRequestedoperation(MMQClientUpdate.QueueOperation.OP_JOIN)
     return upd
 }
 
-function getOpExitUpdate(): MMQClientUpdate {
+const getOpExitUpdate = (): MMQClientUpdate => {
     const upd: MMQClientUpdate = new MMQClientUpdate();
     upd.setRequestedoperation(MMQClientUpdate.QueueOperation.OP_EXIT)
     return upd
 }
 
-function getTestPlayers(numberOfPlayers: number, start = 0): Player[] {
+const getTestPlayers = (numberOfPlayers: number, start = 0): Player[] => {
     const plys: Player[] = [...Array(numberOfPlayers).keys()].map((val)=>({uid:val+start}))
     return plys
 }
 
-function expectPlayersAreInState(plys: Player[], state: MatchingState) : void {
+const expectPlayersAreInState = (plys: Player[], state: MatchingState) : void => {
     plys.forEach((ply) => {
         expect(queue.getPlayerInfo(ply).matchState).toBe(state)
     })

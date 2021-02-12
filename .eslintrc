@@ -13,6 +13,7 @@
     "eol-last":2,
     "no-trailing-spaces":2,
     "no-tabs":2,
+    "func-style":["error", "expression"]
 
   },
   "env": {

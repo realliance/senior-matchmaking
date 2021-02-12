@@ -69,7 +69,6 @@
   },
   "exclude": [
     "jest.config.js",
-    "src/tests",
     "bin/"
   ],
 }

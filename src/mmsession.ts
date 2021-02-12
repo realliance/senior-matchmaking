@@ -1,17 +1,17 @@
-import {Player} from './mmplayer'
+import { Player } from './mmplayer';
 
 export class MatchMakingSessions {
-    _sessions: Record<string, Player>;
+    sessions: Record<string, Player>;
 
     constructor() {
-        this._sessions = {}
+        this.sessions = {};
     }
 
     createSession(token: string, ply: Player) : void {
-        this._sessions[token] = ply;
+        this.sessions[token] = ply;
     }
 
     hasSession(token: string) : boolean {
-        return this._sessions[token] != undefined
+        return this.sessions[token] !== undefined;
     }
 }

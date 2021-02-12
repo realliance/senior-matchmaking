@@ -1,4 +1,4 @@
-import { MMQServerUpdate } from "./proto/matchmaking_pb";
+import { MMQServerUpdate } from './proto/matchmaking_pb';
 
 export interface PlayerChannel {
     write: (res: MMQServerUpdate) => boolean;

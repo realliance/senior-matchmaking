@@ -7,16 +7,26 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "airbnb-typescript/base"
   ],
   "rules": {
     "eol-last":2,
     "no-trailing-spaces":2,
     "no-tabs":2,
-    "func-style":["error", "expression"]
-
+    "func-style":["error", "expression"],
+    "max-classes-per-file":0,
+    "import/prefer-default-export":0,
+    "max-len":0,
+    "indent": ["error", 4, { "SwitchCase": 1 }],
+    "@typescript-eslint/indent": ["error", 4],
+    "no-param-reassign":0,
+    "class-methods-use-this":0
   },
   "env": {
     "jest": true
+  },
+  "parserOptions": {
+    "project": "./tsconfig.json"
   }
 }

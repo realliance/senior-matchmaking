@@ -2,9 +2,11 @@ import assert from 'assert';
 import {
     ConfirmResponse, MatchParameters, MMQClientUpdate, MMQServerUpdate, Status, MatchingState,
 } from './proto/matchmaking_pb';
-import { Player } from './mmplayer';
+import { Player, PlayerUID } from './mmplayer';
 import { PlayerChannel } from './mmchannel';
-import { Match, QueueEntry, MatchConfig, PlayerUID } from './mmmatch';
+import {
+    Match, QueueEntry, MatchConfig,
+} from './mmmatch';
 
 interface PlayerInfo {
     matchState: MatchingState;

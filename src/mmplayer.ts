@@ -1,4 +1,4 @@
-import { PlayerUID } from "./mmmatch";
+export type PlayerUID = string;
 
 export interface Player {
     uid: PlayerUID;

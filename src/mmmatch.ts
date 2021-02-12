@@ -1,7 +1,5 @@
 import { Player } from './mmplayer';
 
-export type PlayerUID = string;
-
 export interface QueueEntry {
     ply: Player;
     entryTime: number;

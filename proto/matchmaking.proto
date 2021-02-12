@@ -5,6 +5,14 @@ enum Status {
     STATUS_ERR = 1;
 }
 
+enum MatchingState {
+    STATE_LOOKING = 0;
+    STATE_CONFIRMING = 1;
+    STATE_INGAME = 2;
+    STATE_IDLE = 3;
+    STATE_CONFIRMED = 4;
+}
+
 message MMQClientUpdate {
     enum QueueOperation {
         OP_JOIN = 0;
@@ -16,17 +24,15 @@ message MMQClientUpdate {
 
 message MMQServerUpdate {
     enum QueueUpdate {
-        STATUS_CANCELLED_SOFT = 0; //Client is still in the pool, but confirmation cancelled
-        STATUS_CANCELLED_HARD = 1; //Client failed to send confirmation and kicked from pool
-        STATUS_PENDING_CONFIRMATION = 2; //Client needs to acknowledge with confirmation endpoint
-        STATUS_QUEUE_UPDATE = 3; //Server updated queue parameters
-        STATUS_MATCH_FOUND = 4; //A match has been found, client must query GetMatchParameters for server info
-        STATUS_RECONNECT = 5; //A match is already in progress for this client. Query GetMatchParameters and reconnect.
-        STATUS_ACK = 6; //Client has joined queue
+        STATUS_QUEUE_UPDATE = 0; //Server updated queue parameters
+        STATUS_RECONNECT = 1; //A match is already in progress for this client. Query GetMatchParameters and reconnect.
+        STATUS_ACK = 2; //Client has joined queue
+        STATUS_STATEUPDATE = 3;
     }
 
     QueueUpdate status = 1;
     uint32 est_queue_time = 2;
+    MatchingState queue_state = 3;
 }
 
 message ConfirmRequest {

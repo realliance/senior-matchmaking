@@ -40,6 +40,9 @@ export class MMQServerUpdate extends jspb.Message {
     getEstQueueTime(): number;
     setEstQueueTime(value: number): MMQServerUpdate;
 
+    getQueueState(): MatchingState;
+    setQueueState(value: MatchingState): MMQServerUpdate;
+
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): MMQServerUpdate.AsObject;
@@ -55,16 +58,14 @@ export namespace MMQServerUpdate {
     export type AsObject = {
         status: MMQServerUpdate.QueueUpdate,
         estQueueTime: number,
+        queueState: MatchingState,
     }
 
     export enum QueueUpdate {
-    STATUS_CANCELLED_SOFT = 0,
-    STATUS_CANCELLED_HARD = 1,
-    STATUS_PENDING_CONFIRMATION = 2,
-    STATUS_QUEUE_UPDATE = 3,
-    STATUS_MATCH_FOUND = 4,
-    STATUS_RECONNECT = 5,
-    STATUS_ACK = 6,
+    STATUS_QUEUE_UPDATE = 0,
+    STATUS_RECONNECT = 1,
+    STATUS_ACK = 2,
+    STATUS_STATEUPDATE = 3,
     }
 
 }
@@ -162,4 +163,12 @@ export namespace MatchParameters {
 export enum Status {
     STATUS_OK = 0,
     STATUS_ERR = 1,
+}
+
+export enum MatchingState {
+    STATE_LOOKING = 0,
+    STATE_CONFIRMING = 1,
+    STATE_INGAME = 2,
+    STATE_IDLE = 3,
+    STATE_CONFIRMED = 4,
 }

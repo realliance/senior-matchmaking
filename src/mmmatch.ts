@@ -11,9 +11,10 @@ export class MatchConfig {
     confirmTimeout = 12 * 1000;
 }
 
-export interface MatchRecord {
+export interface ServerRecord {
     ip: string;
     port: number;
+    serverName: string;
 }
 
 export class Match {
@@ -21,7 +22,7 @@ export class Match {
 
     confirmTimer: NodeJS.Timeout|null = null;
 
-    parameters: MatchRecord|null = null;
+    parameters: ServerRecord|null = null;
 
     constructor(ql: QueueEntry[]) {
         this.players = ql.map((el: QueueEntry) => el.ply);

@@ -5,9 +5,10 @@ import {
 import { Player, PlayerUID } from './mmplayer';
 import { PlayerChannel } from './mmchannel';
 import {
-    Match, QueueEntry, MatchConfig,
+    Match, QueueEntry, MatchConfig, ServerRecord,
 } from './mmmatch';
-import { MatchMakingServerAllocator, ServerRecord } from './mmresource';
+import { MatchMakingServerAllocator } from './mmresource';
+import { notifyMatchInit } from './mmapi';
 
 interface PlayerInfo {
     matchState: MatchingState;
@@ -88,10 +89,9 @@ export class MatchMakingQueue {
             // Time to spin up a server here
             const serverDetails: ServerRecord|null = await this.allocator.allocateServer();
             if (serverDetails !== null) {
-                match.parameters = {
-                    ip: serverDetails.ip,
-                    port: serverDetails.port,
-                };
+                match.parameters = serverDetails;
+
+                await notifyMatchInit(match);
             } else {
                 // Something bad happened and we could not allocate a server
                 return false;

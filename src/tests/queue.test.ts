@@ -1,10 +1,15 @@
 import { PlayerChannel } from '../mmchannel';
 import { Player } from '../mmplayer';
 import { MatchMakingQueue } from '../mmqueue';
-import { ServerRecord } from '../mmresource';
+import { ServerRecord } from '../mmmatch';
 import {
     MatchingState, MMQClientUpdate, MMQServerUpdate, Status,
 } from '../proto/matchmaking_pb';
+import * as mmapi from '../mmapi';
+
+jest.mock('../mmapi');
+const mockedmmapi = mmapi as jest.Mocked<typeof mmapi>;
+mockedmmapi.notifyMatchInit.mockResolvedValue('fake-id');
 
 jest.mock('../mmresource', () => ({
     MatchMakingServerAllocator: jest.fn().mockImplementation(() => ({

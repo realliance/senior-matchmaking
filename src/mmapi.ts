@@ -21,6 +21,7 @@ export const notifyMatchInit = async (match: Match) : Promise<string|null> => {
         .send({
             match: {
                 users: match.players.map((ply: Player) => ply.uid),
+                serverName: match.parameters?.serverName,
             },
         });
 

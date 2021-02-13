@@ -1,4 +1,5 @@
 import { KubeConfig, CustomObjectsApi } from '@kubernetes/client-node';
+import { ServerRecord } from './mmmatch';
 
 export interface AllocationResponse {
     kind: string;
@@ -21,12 +22,6 @@ export interface AllocationResponse {
         address: string;
         nodeName: string;
     }
-}
-
-export interface ServerRecord {
-    ip: string;
-    port: number;
-    serverName: string;
 }
 
 export class MatchMakingServerAllocator {

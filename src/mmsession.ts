@@ -1,6 +1,6 @@
+import { ServerDuplexStream } from '@grpc/grpc-js';
 import { Player, PlayerUID } from './mmplayer';
-import {MMQClientUpdate, MMQServerUpdate} from './proto/matchmaking_pb';
-import {ServerDuplexStream} from '@grpc/grpc-js';
+import { MMQClientUpdate, MMQServerUpdate } from './proto/matchmaking_pb';
 import { getPlayerInfo } from './mmapi';
 
 type PlayerConnection = ServerDuplexStream<MMQClientUpdate, MMQServerUpdate>;
@@ -12,6 +12,7 @@ interface Session {
 
 export class MatchMakingSessions {
     sessions: Record<string, Session>;
+
     playerToToken: Record<PlayerUID, string>;
 
     constructor() {
@@ -22,7 +23,7 @@ export class MatchMakingSessions {
     createSession(token: string, ply: Player, conn: PlayerConnection) : void {
         this.sessions[token] = {
             player: ply,
-            connection: conn
+            connection: conn,
         };
 
         this.playerToToken[ply.uid] = token;
@@ -37,13 +38,13 @@ export class MatchMakingSessions {
     }
 
     async initConnection(token: string, call: PlayerConnection) : Promise<boolean> {
-        if(this.hasSession(token)) {
+        if (this.hasSession(token)) {
             this.kickSessionByToken(token);
         }
 
-        //Retreive player info from the accounts service, or null if the token is invalid.
-        let ply: Player|null = await getPlayerInfo(token);
-        if(ply === null) {
+        // Retreive player info from the accounts service, or null if the token is invalid.
+        const ply: Player|null = await getPlayerInfo(token);
+        if (ply === null) {
             call.end();
             return false;
         }
@@ -53,7 +54,7 @@ export class MatchMakingSessions {
     }
 
     validateSession(token: string) : Player|null {
-        if(this.hasSession(token)) {
+        if (this.hasSession(token)) {
             return this.getSession(token).player;
         }
 
@@ -76,7 +77,7 @@ export class MatchMakingSessions {
 
     kickSessionByPlayer(ply: Player) : void {
         const token = this.playerToToken[ply.uid];
-        if(token) {
+        if (token) {
             this.kickSessionByToken(token);
         }
     }

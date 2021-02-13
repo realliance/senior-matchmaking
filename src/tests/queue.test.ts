@@ -1,12 +1,22 @@
 import { PlayerChannel } from '../mmchannel';
 import { Player } from '../mmplayer';
 import { MatchMakingQueue } from '../mmqueue';
+import { ServerRecord } from '../mmresource';
 import {
     MatchingState, MMQClientUpdate, MMQServerUpdate, Status,
 } from '../proto/matchmaking_pb';
 
-let queue: MatchMakingQueue = new MatchMakingQueue();
+jest.mock('../mmresource', () => ({
+    MatchMakingServerAllocator: jest.fn().mockImplementation(() => ({
+        allocateServer: async () : Promise<ServerRecord|null> => ({
+            ip: 'fake-ip',
+            port: 1001,
+            serverName: 'fake-server',
+        }),
+    })),
+}));
 
+let queue: MatchMakingQueue;
 beforeEach(() => {
     queue = new MatchMakingQueue();
 });

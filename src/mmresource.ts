@@ -62,7 +62,7 @@ export class MatchMakingServerAllocator {
             return {
                 ip: alloc.status.address,
                 port: alloc.status.ports[0].port,
-                serverName: alloc.status.gameServerName
+                serverName: alloc.status.gameServerName,
             };
         }
 

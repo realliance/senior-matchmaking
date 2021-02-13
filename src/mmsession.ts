@@ -3,7 +3,7 @@ import { Player, PlayerUID } from './mmplayer';
 import { MMQClientUpdate, MMQServerUpdate } from './proto/matchmaking_pb';
 import { getPlayerInfo } from './mmapi';
 
-type PlayerConnection = ServerDuplexStream<MMQClientUpdate, MMQServerUpdate>;
+export type PlayerConnection = ServerDuplexStream<MMQClientUpdate, MMQServerUpdate>;
 
 interface Session {
     player: Player;
@@ -44,6 +44,7 @@ export class MatchMakingSessions {
 
         // Retreive player info from the accounts service, or null if the token is invalid.
         const ply: Player|null = await getPlayerInfo(token);
+
         if (ply === null) {
             call.end();
             return false;

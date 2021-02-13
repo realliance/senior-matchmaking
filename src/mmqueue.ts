@@ -7,6 +7,7 @@ import { PlayerChannel } from './mmchannel';
 import {
     Match, QueueEntry, MatchConfig,
 } from './mmmatch';
+import { MatchMakingServerAllocator, ServerRecord } from './mmresource';
 
 interface PlayerInfo {
     matchState: MatchingState;
@@ -21,6 +22,8 @@ export class MatchMakingQueue {
     playerToMatch: Record<PlayerUID, Match> = {};
 
     config: MatchConfig = new MatchConfig();
+
+    allocator: MatchMakingServerAllocator = new MatchMakingServerAllocator(process.env.allocatorFleet || '', process.env.allocatorNamepsace || '');
 
     getPlayerInfo(ply: Player) : PlayerInfo {
         return this.players[ply.uid];
@@ -83,6 +86,16 @@ export class MatchMakingQueue {
         // If every player has confirmed
         if (match.players.every((ply:Player) => this.getPlayerInfo(ply).matchState === MatchingState.STATE_CONFIRMED)) {
             // Time to spin up a server here
+            const serverDetails: ServerRecord|null = await this.allocator.allocateServer();
+            if (serverDetails !== null) {
+                match.parameters = {
+                    ip: serverDetails.ip,
+                    port: serverDetails.port,
+                };
+            } else {
+                // Something bad happened and we could not allocate a server
+                return false;
+            }
 
             // Mark players as IN_GAME, at this point match parameters can be retreived
             match.players.forEach((ply: Player) => {

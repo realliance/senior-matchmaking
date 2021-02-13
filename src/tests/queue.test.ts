@@ -16,6 +16,10 @@ jest.mock('../mmresource', () => ({
     })),
 }));
 
+const waitForEvents = (): Promise<void> => new Promise((resolve) => {
+    setImmediate(resolve)
+});
+
 let queue: MatchMakingQueue;
 beforeEach(() => {
     queue = new MatchMakingQueue();
@@ -137,7 +141,7 @@ describe('Single-player queue correctness', () => {
 });
 
 describe('Matchmaking functionality', () => {
-    test('Match can be setup', () => {
+    test('Match can be setup', async () => {
         const plys: Player[] = getTestPlayers(8);
         plys.forEach((ply) => queue.onPlayerConnected(ply, getTestChannel()));
         expect(queue.serveQueue()).toBeFalsy();
@@ -151,6 +155,9 @@ describe('Matchmaking functionality', () => {
         plys.forEach((ply) => {
             expect(queue.onPlayerConfirm(ply).getStatus()).toBe(Status.STATUS_OK);
         });
+
+        //The match is spooled asynchronously, so we need to wait for that to complete
+        await waitForEvents();
 
         expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
     });
@@ -242,7 +249,7 @@ describe('Matchmaking functionality', () => {
         expectPlayersAreInState(plys.slice(0, 2), MatchingState.STATE_IDLE);
     });
 
-    test('Player returns to STATE_INGAME after reconnecting', () => {
+    test('Player returns to STATE_INGAME after reconnecting', async () => {
         const plys: Player[] = getTestPlayers(8);
         plys.forEach((ply) => queue.onPlayerConnected(ply, getTestChannel()));
         expect(queue.serveQueue()).toBeFalsy();
@@ -257,6 +264,8 @@ describe('Matchmaking functionality', () => {
             expect(queue.onPlayerConfirm(ply).getStatus()).toBe(Status.STATUS_OK);
         });
 
+        await waitForEvents();
+
         expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
         queue.onPlayerDisconnect(plys[0]);
 
@@ -268,5 +277,21 @@ describe('Matchmaking functionality', () => {
         expect(writeMock).toHaveBeenCalledTimes(1);
         expect(writeMock.mock.calls[0][0])
             .toMatchObject(buildMMQObject(MatchingState.STATE_INGAME, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
+    });
+
+    test('Match parameters can be retreived', async () => {
+        const plys: Player[] = getTestPlayers(8);
+        plys.forEach((ply) => queue.onPlayerConnected(ply, getTestChannel()));
+        plys.forEach((ply) => queue.onPlayerUpdate(getOpJoinUpdate(), ply));
+        expect(queue.serveQueue()).toBeTruthy();
+        plys.forEach((ply) => {
+            expect(queue.onPlayerConfirm(ply).getStatus()).toBe(Status.STATUS_OK);
+        });
+        await waitForEvents();
+
+        expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
+
+        expect(queue.onPlayerRequestMatchParams(plys[0]).getIp()).toBe('fake-ip')
+        expect(queue.onPlayerRequestMatchParams(plys[0]).getPort()).toBe(1001)
     });
 });

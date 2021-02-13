@@ -1,5 +1,5 @@
-export interface Player {
-    uid: number;
-}
+export type PlayerUID = string;
 
-export const getPlayerInfo = async (token: string) : Promise<Player> => ({ uid: 0 });
+export interface Player {
+    uid: PlayerUID;
+}

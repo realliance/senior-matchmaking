@@ -1,6 +1,9 @@
+import { PlayerChannel } from '../mmchannel';
 import { Player } from '../mmplayer';
 import { MatchMakingQueue } from '../mmqueue';
-import { MatchingState, MMQClientUpdate, Status } from '../proto/matchmaking_pb';
+import {
+    MatchingState, MMQClientUpdate, MMQServerUpdate, Status,
+} from '../proto/matchmaking_pb';
 
 let queue: MatchMakingQueue = new MatchMakingQueue();
 
@@ -8,7 +11,9 @@ beforeEach(() => {
     queue = new MatchMakingQueue();
 });
 
-const getTestChannel = () => ({ write: () => true, end: () => null });
+jest.useFakeTimers();
+
+const getTestChannel = () : PlayerChannel => ({ write: () => true, end: () => null });
 
 const getOpJoinUpdate = (): MMQClientUpdate => {
     const upd: MMQClientUpdate = new MMQClientUpdate();
@@ -23,7 +28,7 @@ const getOpExitUpdate = (): MMQClientUpdate => {
 };
 
 const getTestPlayers = (numberOfPlayers: number, start = 0): Player[] => {
-    const plys: Player[] = [...Array(numberOfPlayers).keys()].map((val) => ({ uid: val + start }));
+    const plys: Player[] = [...Array(numberOfPlayers).keys()].map((val) => ({ uid: `${(val + start)}` }));
     return plys;
 };
 
@@ -33,29 +38,36 @@ const expectPlayersAreInState = (plys: Player[], state: MatchingState) : void =>
     });
 };
 
+const buildMMQObject = (state: MatchingState, status: MMQServerUpdate.QueueUpdate) : MMQServerUpdate => {
+    const upd: MMQServerUpdate = new MMQServerUpdate();
+    upd.setStatus(status);
+    upd.setQueueState(state);
+    return upd;
+};
+
 describe('Single-player queue correctness', () => {
     test('Player is stored on connection', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: '0' };
         queue.onPlayerConnected(ply, getTestChannel());
         expect(queue.players[ply.uid]).toBeTruthy();
         expect(queue.getPlayerInfo(ply)).toBeTruthy();
     });
 
     test('Player initially has STATE_IDLE', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: '0' };
         queue.onPlayerConnected(ply, getTestChannel());
         expect(queue.getPlayerInfo(ply).matchState).toBe(MatchingState.STATE_IDLE);
     });
 
     test('OP_JOIN joins a player to the queue', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: '0' };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.queue.length).toBe(1);
     });
 
     test('Player can be removed from queue', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: '0' };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.queue.length).toBe(1);
@@ -69,7 +81,7 @@ describe('Single-player queue correctness', () => {
     });
 
     test('Player can leave queue', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: '0' };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.queue.length).toBe(1);
@@ -79,7 +91,7 @@ describe('Single-player queue correctness', () => {
     });
 
     test('Player is cleaned up after disconnecting', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: '0' };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
         expect(queue.players[ply.uid]).toBeTruthy();
@@ -91,7 +103,7 @@ describe('Single-player queue correctness', () => {
     });
 
     test('Correct player state after issuing OP_EXIT', () => {
-        const ply: Player = { uid: 0 };
+        const ply: Player = { uid: '0' };
         queue.onPlayerConnected(ply, getTestChannel());
         queue.onPlayerUpdate(getOpJoinUpdate(), ply);
 
@@ -99,6 +111,18 @@ describe('Single-player queue correctness', () => {
         expect(queue.queue.length).toBe(0);
         expectPlayersAreInState([ply], MatchingState.STATE_IDLE);
         expect(queue.players[ply.uid]).toBeTruthy();
+    });
+
+    test('STATE_IDLE update is dispatched on connection', () => {
+        const ply: Player = { uid: '0' };
+
+        const writeMock : jest.Mock<boolean, [MMQServerUpdate]> = jest.fn().mockReturnValue(true);
+        const endMock : jest.Mock<boolean, [void]> = jest.fn().mockReturnValue(true);
+        const channel: PlayerChannel = { write: writeMock, end: endMock };
+        queue.onPlayerConnected(ply, channel);
+        expect(writeMock).toBeCalled();
+        expect(writeMock.mock.calls[0][0])
+            .toMatchObject(buildMMQObject(MatchingState.STATE_IDLE, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
     });
 });
 
@@ -178,7 +202,7 @@ describe('Matchmaking functionality', () => {
 
     test('Match cancelled if confirmation stage times out', async () => {
         // Lower confirmation timeout
-        queue.config.confirmTimeout = 50;
+        queue.config.confirmTimeout = 10000;
 
         const plys: Player[] = getTestPlayers(8);
         plys.forEach((ply) => queue.onPlayerConnected(ply, getTestChannel()));
@@ -192,9 +216,7 @@ describe('Matchmaking functionality', () => {
         });
 
         // Wait for the confirmation timeout to expire
-        await new Promise((resolve) => {
-            setTimeout(resolve, 100);
-        });
+        jest.advanceTimersByTime(10000);
 
         // All 8 players should be present in the player roster
         expect(Object.keys(queue.players).length).toBe(8);
@@ -208,5 +230,33 @@ describe('Matchmaking functionality', () => {
         // Remaining players should have the proper state
         expectPlayersAreInState(plys.slice(2, 8), MatchingState.STATE_LOOKING);
         expectPlayersAreInState(plys.slice(0, 2), MatchingState.STATE_IDLE);
+    });
+
+    test('Player returns to STATE_INGAME after reconnecting', () => {
+        const plys: Player[] = getTestPlayers(8);
+        plys.forEach((ply) => queue.onPlayerConnected(ply, getTestChannel()));
+        expect(queue.serveQueue()).toBeFalsy();
+        expectPlayersAreInState(plys, MatchingState.STATE_IDLE);
+
+        plys.forEach((ply) => queue.onPlayerUpdate(getOpJoinUpdate(), ply));
+        expectPlayersAreInState(plys, MatchingState.STATE_LOOKING);
+        expect(queue.serveQueue()).toBeTruthy();
+        expectPlayersAreInState(plys, MatchingState.STATE_CONFIRMING);
+
+        plys.forEach((ply) => {
+            expect(queue.onPlayerConfirm(ply).getStatus()).toBe(Status.STATUS_OK);
+        });
+
+        expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
+        queue.onPlayerDisconnect(plys[0]);
+
+        const writeMock : jest.Mock<boolean, [MMQServerUpdate]> = jest.fn().mockReturnValue(true);
+        const endMock : jest.Mock<boolean, [void]> = jest.fn().mockReturnValue(true);
+        const channel: PlayerChannel = { write: writeMock, end: endMock };
+        queue.onPlayerConnected(plys[0], channel);
+
+        expect(writeMock).toHaveBeenCalledTimes(1);
+        expect(writeMock.mock.calls[0][0])
+            .toMatchObject(buildMMQObject(MatchingState.STATE_INGAME, MMQServerUpdate.QueueUpdate.STATUS_STATEUPDATE));
     });
 });

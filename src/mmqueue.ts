@@ -2,48 +2,23 @@ import assert from 'assert';
 import {
     ConfirmResponse, MatchParameters, MMQClientUpdate, MMQServerUpdate, Status, MatchingState,
 } from './proto/matchmaking_pb';
-import { Player } from './mmplayer';
+import { Player, PlayerUID } from './mmplayer';
 import { PlayerChannel } from './mmchannel';
-
-interface QueueEntry {
-    ply: Player;
-    entryTime: number;
-}
+import {
+    Match, QueueEntry, MatchConfig,
+} from './mmmatch';
 
 interface PlayerInfo {
     matchState: MatchingState;
     channel: PlayerChannel;
 }
 
-class MatchConfig {
-    numPlayers = 8;
-
-    confirmTimeout = 12 * 1000;
-}
-
-interface MatchRecord {
-    ip: string;
-    port: number;
-}
-
-class Match {
-    players: Player[];
-
-    confirmTimer: NodeJS.Timeout|null = null;
-
-    parameters: MatchRecord|null = null;
-
-    constructor(ql: QueueEntry[]) {
-        this.players = ql.map((el: QueueEntry) => el.ply);
-    }
-}
-
 export class MatchMakingQueue {
-    players: Record<number, PlayerInfo> = {};
+    players: Record<PlayerUID, PlayerInfo> = {};
 
     queue: Array<QueueEntry> = [];
 
-    playerToMatch: Record<number, Match> = {};
+    playerToMatch: Record<PlayerUID, Match> = {};
 
     config: MatchConfig = new MatchConfig();
 
@@ -60,6 +35,13 @@ export class MatchMakingQueue {
             matchState: MatchingState.STATE_IDLE,
             channel,
         };
+
+        // Player has disconnected but is still in a match, so we give the opportunity to reconnect.
+        if (this.playerToMatch[ply.uid]) {
+            this.players[ply.uid].matchState = MatchingState.STATE_INGAME;
+        }
+
+        this.updatePlayerState(ply, this.players[ply.uid].matchState);
     }
 
     updatePlayerState(ply: Player, state: MatchingState) : void {

@@ -490,7 +490,7 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@kubernetes/client-node@^0.13.2":
+"@kubernetes/client-node@0.13.2":
   version "0.13.2"
   resolved "https://registry.yarnpkg.com/@kubernetes/client-node/-/client-node-0.13.2.tgz#881eb407afbd5b499e5daf898ffcc40f839709e7"
   integrity sha512-ufvGfjBXuy5LbZTJZ8bd1eRVgWUd9rRDCryMWNfxb4372Q60R1oG8qy7svUB9NqBmwFgKHuaXkrfq3rFFbGrew==

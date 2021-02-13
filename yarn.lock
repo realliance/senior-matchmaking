@@ -647,7 +647,7 @@
   resolved "https://registry.yarnpkg.com/@types/strip-json-comments/-/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
   integrity sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==
 
-"@types/superagent@^4.1.10":
+"@types/superagent@4.1.10":
   version "4.1.10"
   resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-4.1.10.tgz#5e2cc721edf58f64fe9b819f326ee74803adee86"
   integrity sha512-xAgkb2CMWUMCyVc/3+7iQfOEBE75NvuZeezvmixbUw3nmENf2tCnQkW5yQLTYqvXUQ+R6EXxdqKKbal2zM5V/g==
@@ -2627,7 +2627,7 @@ google-protobuf@3.12.4:
   resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.12.4.tgz#fd89b7e5052cdb35a80f9b455612851d542a5c9f"
   integrity sha512-ItTn8YepDQMHEMHloUPH+FDaTPiHTnbsMvP50aXfbI65IK3AA5+wXlHSygJH8xz+h1g4gu7V+CK5X1/SaGITsA==
 
-google-protobuf@^3.15.0-rc.1:
+google-protobuf@3.15.0-rc.1:
   version "3.15.0-rc.1"
   resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.15.0-rc.1.tgz#f60b5c53389109bb7964e53d2b1e0a19155c5cd0"
   integrity sha512-aDpp0vaiFaM9Thv5H0UC2FJ3x4XzBABM1v+Q5V5GGyTNd1VsZXjKTPdI0ObFgio2tpBWO7nFy2cQmJ9n+6n95A==
@@ -5433,7 +5433,7 @@ success-symbol@^0.1.0:
   resolved "https://registry.yarnpkg.com/success-symbol/-/success-symbol-0.1.0.tgz#24022e486f3bf1cdca094283b769c472d3b72897"
   integrity sha1-JAIuSG878c3KCUKDt2nEctO3KJc=
 
-superagent@^6.1.0:
+superagent@6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/superagent/-/superagent-6.1.0.tgz#09f08807bc41108ef164cfb4be293cebd480f4a6"
   integrity sha512-OUDHEssirmplo3F+1HWKUrUjvnQuA+nZI6i/JJBdXb5eq9IyEQwPyPpqND+SSsxf6TygpBEkUjISVRN4/VOpeg==

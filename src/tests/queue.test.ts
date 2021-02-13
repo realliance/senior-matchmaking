@@ -17,7 +17,7 @@ jest.mock('../mmresource', () => ({
 }));
 
 const waitForEvents = (): Promise<void> => new Promise((resolve) => {
-    setImmediate(resolve)
+    setImmediate(resolve);
 });
 
 let queue: MatchMakingQueue;
@@ -156,7 +156,7 @@ describe('Matchmaking functionality', () => {
             expect(queue.onPlayerConfirm(ply).getStatus()).toBe(Status.STATUS_OK);
         });
 
-        //The match is spooled asynchronously, so we need to wait for that to complete
+        // The match is spooled asynchronously, so we need to wait for that to complete
         await waitForEvents();
 
         expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
@@ -291,7 +291,7 @@ describe('Matchmaking functionality', () => {
 
         expectPlayersAreInState(plys, MatchingState.STATE_INGAME);
 
-        expect(queue.onPlayerRequestMatchParams(plys[0]).getIp()).toBe('fake-ip')
-        expect(queue.onPlayerRequestMatchParams(plys[0]).getPort()).toBe(1001)
+        expect(queue.onPlayerRequestMatchParams(plys[0]).getIp()).toBe('fake-ip');
+        expect(queue.onPlayerRequestMatchParams(plys[0]).getPort()).toBe(1001);
     });
 });

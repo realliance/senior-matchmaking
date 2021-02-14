@@ -47,14 +47,14 @@ export class MatchMakingSessions {
         }
 
         let ply: Player|null = null;
-        if(!this.authenticationDisabled) {
+        if (!this.authenticationDisabled) {
             // Retreive player info from the accounts service, or null if the token is invalid.
             ply = await getPlayerInfo(token);
         } else {
             // Use the user provided token as the player id when auth is disabled.
             ply = {
-                uid: token
-            }
+                uid: token,
+            };
         }
 
         if (ply === null) {

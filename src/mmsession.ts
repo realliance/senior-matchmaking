@@ -15,9 +15,13 @@ export class MatchMakingSessions {
 
     playerToToken: Record<PlayerUID, string>;
 
+    authenticationDisabled = false;
+
     constructor() {
         this.sessions = {};
         this.playerToToken = {};
+
+        this.authenticationDisabled = (process.env.DISABLE_AUTH || '').toLowerCase() === 'true';
     }
 
     createSession(token: string, ply: Player, conn: PlayerConnection) : void {
@@ -42,8 +46,16 @@ export class MatchMakingSessions {
             this.kickSessionByToken(token);
         }
 
-        // Retreive player info from the accounts service, or null if the token is invalid.
-        const ply: Player|null = await getPlayerInfo(token);
+        let ply: Player|null = null;
+        if(!this.authenticationDisabled) {
+            // Retreive player info from the accounts service, or null if the token is invalid.
+            ply = await getPlayerInfo(token);
+        } else {
+            // Use the user provided token as the player id when auth is disabled.
+            ply = {
+                uid: token
+            }
+        }
 
         if (ply === null) {
             call.end();

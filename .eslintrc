@@ -21,7 +21,8 @@
     "indent": ["error", 4, { "SwitchCase": 1 }],
     "@typescript-eslint/indent": ["error", 4],
     "no-param-reassign":0,
-    "class-methods-use-this":0
+    "class-methods-use-this":0,
+    "no-console":0
   },
   "env": {
     "jest": true

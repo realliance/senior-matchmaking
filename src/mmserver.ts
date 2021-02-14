@@ -24,8 +24,8 @@ export class MatchMakingServer implements IMatchMakingServer {
         }
 
         playerQueue.onPlayerConnected(ply, {
-            write: call.write,
-            end: call.end,
+            write: call.write.bind(call),
+            end: call.end.bind(call),
         });
 
         call.on('data', (req: mm.MMQClientUpdate) => {

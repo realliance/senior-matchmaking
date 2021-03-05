@@ -22,7 +22,7 @@
     "ts-node-dev": "1.1.6"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.2.9",
+    "@grpc/grpc-js": "1.2.10",
     "@kubernetes/client-node": "0.14.0",
     "@types/node": "14.14.31",
     "superagent": "6.1.0",

@@ -26,6 +26,12 @@ export class MatchMakingQueue {
 
     allocator: MatchMakingServerAllocator = new MatchMakingServerAllocator(process.env.allocatorFleet || '', process.env.allocatorNamepsace || '');
 
+    queueMain : NodeJS.Timeout|null = null;
+
+    constructor() {
+        this.queueMain = setInterval(this.serveQueue.bind(this), 1000);
+    }
+
     getPlayerInfo(ply: Player) : PlayerInfo {
         return this.players[ply.uid];
     }
@@ -157,7 +163,7 @@ export class MatchMakingQueue {
 
         // Player can enter the queue
         if (info.matchState === MatchingState.STATE_IDLE) {
-            info.matchState = MatchingState.STATE_LOOKING;
+            this.updatePlayerState(ply, MatchingState.STATE_LOOKING)
             this.queue.push({
                 ply,
                 entryTime: Date.now() / 1000,

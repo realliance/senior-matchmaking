@@ -149,7 +149,7 @@ export class MatchMakingQueue {
             // Invalidate the timer
             match.confirmTimer = null;
 
-            const unconfirmedPlayers: Player[] = match.players.filter((ply:Player) => this.getPlayerInfo(ply).matchState !== MatchingState.STATE_CONFIRMED);
+            const unconfirmedPlayers: Player[] = match.players.filter((ply:Player) => this.getPlayerInfo(ply) && this.getPlayerInfo(ply).matchState !== MatchingState.STATE_CONFIRMED);
 
             // Match needs to be cancelled
             if (unconfirmedPlayers.length > 0) this.cancelMatch(match, unconfirmedPlayers);

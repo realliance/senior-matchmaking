@@ -1,4 +1,4 @@
-FROM node:fermium-alpine@sha256:76badf0d0284ad838536d49d8a804988b4985fc6bc7242dfff4f8216c851438b as builder
+FROM node:fermium-alpine@sha256:a75f7cc536062f9266f602d49047bc249826581406f8bc5a6605c76f9ed18e98 as builder
 
 WORKDIR /app
 ENV NODE_ENV production
@@ -10,7 +10,7 @@ RUN yarn install
 ADD . .
 RUN yarn build
 
-FROM node:fermium-alpine@sha256:76badf0d0284ad838536d49d8a804988b4985fc6bc7242dfff4f8216c851438b
+FROM node:fermium-alpine@sha256:a75f7cc536062f9266f602d49047bc249826581406f8bc5a6605c76f9ed18e98
 WORKDIR /app
 ENV NODE_ENV production
 

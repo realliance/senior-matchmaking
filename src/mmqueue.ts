@@ -24,7 +24,7 @@ export class MatchMakingQueue {
 
     config: MatchConfig = new MatchConfig();
 
-    allocator: MatchMakingServerAllocator = new MatchMakingServerAllocator(process.env.allocatorFleet || '', process.env.allocatorNamepsace || '');
+    allocator: MatchMakingServerAllocator = new MatchMakingServerAllocator(process.env.ALLOCATOR_FLEET || '', process.env.ALLOCATOR_NAMESPACE || '');
 
     queueMain : NodeJS.Timeout|null = null;
 

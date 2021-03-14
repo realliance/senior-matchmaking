@@ -5,9 +5,10 @@ import {
 import { Player, PlayerUID } from './mmplayer';
 import { PlayerChannel } from './mmchannel';
 import {
-    Match, QueueEntry, MatchConfig,
+    Match, QueueEntry, MatchConfig, ServerRecord,
 } from './mmmatch';
-import { MatchMakingServerAllocator, ServerRecord } from './mmresource';
+import { MatchMakingServerAllocator } from './mmresource';
+import { notifyMatchInit } from './mmapi';
 
 interface PlayerInfo {
     matchState: MatchingState;
@@ -23,7 +24,13 @@ export class MatchMakingQueue {
 
     config: MatchConfig = new MatchConfig();
 
-    allocator: MatchMakingServerAllocator = new MatchMakingServerAllocator(process.env.allocatorFleet || '', process.env.allocatorNamepsace || '');
+    allocator: MatchMakingServerAllocator = new MatchMakingServerAllocator(process.env.ALLOCATOR_FLEET || '', process.env.ALLOCATOR_NAMESPACE || '');
+
+    queueMain : NodeJS.Timeout|null = null;
+
+    constructor() {
+        this.queueMain = setInterval(this.serveQueue.bind(this), 1000);
+    }
 
     getPlayerInfo(ply: Player) : PlayerInfo {
         return this.players[ply.uid];
@@ -88,10 +95,9 @@ export class MatchMakingQueue {
             // Time to spin up a server here
             const serverDetails: ServerRecord|null = await this.allocator.allocateServer();
             if (serverDetails !== null) {
-                match.parameters = {
-                    ip: serverDetails.ip,
-                    port: serverDetails.port,
-                };
+                match.parameters = serverDetails;
+
+                await notifyMatchInit(match);
             } else {
                 // Something bad happened and we could not allocate a server
                 return false;
@@ -143,7 +149,7 @@ export class MatchMakingQueue {
             // Invalidate the timer
             match.confirmTimer = null;
 
-            const unconfirmedPlayers: Player[] = match.players.filter((ply:Player) => this.getPlayerInfo(ply).matchState !== MatchingState.STATE_CONFIRMED);
+            const unconfirmedPlayers: Player[] = match.players.filter((ply:Player) => this.getPlayerInfo(ply) && this.getPlayerInfo(ply).matchState !== MatchingState.STATE_CONFIRMED);
 
             // Match needs to be cancelled
             if (unconfirmedPlayers.length > 0) this.cancelMatch(match, unconfirmedPlayers);
@@ -157,7 +163,7 @@ export class MatchMakingQueue {
 
         // Player can enter the queue
         if (info.matchState === MatchingState.STATE_IDLE) {
-            info.matchState = MatchingState.STATE_LOOKING;
+            this.updatePlayerState(ply, MatchingState.STATE_LOOKING)
             this.queue.push({
                 ply,
                 entryTime: Date.now() / 1000,

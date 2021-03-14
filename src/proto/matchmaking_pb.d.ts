@@ -10,7 +10,6 @@ export class MMQClientUpdate extends jspb.Message {
     getRequestedoperation(): MMQClientUpdate.QueueOperation;
     setRequestedoperation(value: MMQClientUpdate.QueueOperation): MMQClientUpdate;
 
-
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): MMQClientUpdate.AsObject;
     static toObject(includeInstance: boolean, msg: MMQClientUpdate): MMQClientUpdate.AsObject;
@@ -36,13 +35,10 @@ export namespace MMQClientUpdate {
 export class MMQServerUpdate extends jspb.Message { 
     getStatus(): MMQServerUpdate.QueueUpdate;
     setStatus(value: MMQServerUpdate.QueueUpdate): MMQServerUpdate;
-
     getEstQueueTime(): number;
     setEstQueueTime(value: number): MMQServerUpdate;
-
     getQueueState(): MatchingState;
     setQueueState(value: MatchingState): MMQServerUpdate;
-
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): MMQServerUpdate.AsObject;
@@ -89,7 +85,6 @@ export class ConfirmResponse extends jspb.Message {
     getStatus(): Status;
     setStatus(value: Status): ConfirmResponse;
 
-
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): ConfirmResponse.AsObject;
     static toObject(includeInstance: boolean, msg: ConfirmResponse): ConfirmResponse.AsObject;
@@ -126,13 +121,10 @@ export namespace MatchParametersRequest {
 export class MatchParameters extends jspb.Message { 
     getStatus(): MatchParameters.MatchStatus;
     setStatus(value: MatchParameters.MatchStatus): MatchParameters;
-
     getIp(): string;
     setIp(value: string): MatchParameters;
-
     getPort(): number;
     setPort(value: number): MatchParameters;
-
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): MatchParameters.AsObject;

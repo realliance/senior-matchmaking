@@ -1,4 +1,5 @@
 import { KubeConfig, CustomObjectsApi } from '@kubernetes/client-node';
+import { ServerRecord } from './mmmatch';
 
 export interface AllocationResponse {
     kind: string;
@@ -23,12 +24,6 @@ export interface AllocationResponse {
     }
 }
 
-export interface ServerRecord {
-    ip: string;
-    port: number;
-    serverName: string;
-}
-
 export class MatchMakingServerAllocator {
     api: CustomObjectsApi;
 
@@ -38,7 +33,7 @@ export class MatchMakingServerAllocator {
 
     constructor(fleet: string, namespace: string) {
         const kc: KubeConfig = new KubeConfig();
-        kc.loadFromDefault();
+        kc.loadFromCluster();
         this.api = kc.makeApiClient(CustomObjectsApi);
 
         this.fleet = fleet;

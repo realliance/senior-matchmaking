@@ -65,12 +65,13 @@ jobs:
               path: .
           caches:
             - path: node_modules
+            - path: .yarn
           run:
             path: /bin/sh
             args:
               - -exc
               - |
-                yarn install
+                yarn install --cache-folder .yarn
       - in_parallel:
           - task: jest
             image: node
@@ -81,11 +82,13 @@ jobs:
                   path: .
               caches:
                 - path: node_modules
+                - path: .yarn
               run:
                 path: /bin/sh
                 args:
                   - -exc
                   - |
+                    yarn install --cache-folder .yarn
                     yarn run jest
           - task: eslint
             image: node
@@ -96,11 +99,13 @@ jobs:
                   path: .
               caches:
                 - path: node_modules
+                - path: .yarn
               run:
                 path: /bin/sh
                 args:
                   - -exc
                   - |
+                    yarn install --cache-folder .yarn
                     yarn run eslint src
           - task: yamllint
             image: python

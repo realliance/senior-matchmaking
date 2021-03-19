@@ -86,7 +86,7 @@ jobs:
                 args:
                   - -exc
                   - |
-                    yarn jest
+                    yarn run jest
           - task: eslint
             image: node
             config:
@@ -101,7 +101,7 @@ jobs:
                 args:
                   - -exc
                   - |
-                    yarn eslint src
+                    yarn run eslint src
           - task: yamllint
             image: python
             config:

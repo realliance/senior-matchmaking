@@ -15,8 +15,8 @@ export const getPlayerInfo = async (token: string) : Promise<Player|null> => {
 };
 
 export const notifyMatchInit = async (match: Match) : Promise<string|null> => {
-    if(process.env.DISABLE_API) {
-        return match.parameters?.serverName || ""
+    if (process.env.DISABLE_API) {
+        return match.parameters?.serverName || '';
     }
 
     const res = await superagent.post(

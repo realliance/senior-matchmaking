@@ -10,10 +10,7 @@ server.bindAsync('0.0.0.0:4000', grpc.ServerCredentials.createInsecure(), (error
     server.start();
 });
 
-
-process.on('unhandledRejection', (error : any, p) => {
-  console.log('Unhandled Rejection')
-  if(error)
-    console.log(error)
+process.on('unhandledRejection', (error: Error | null) => {
+    console.log('Unhandled Rejection');
+    if (error) console.log(error);
 });
-

@@ -163,7 +163,7 @@ export class MatchMakingQueue {
 
         // Player can enter the queue
         if (info.matchState === MatchingState.STATE_IDLE) {
-            this.updatePlayerState(ply, MatchingState.STATE_LOOKING)
+            this.updatePlayerState(ply, MatchingState.STATE_LOOKING);
             this.queue.push({
                 ply,
                 entryTime: Date.now() / 1000,

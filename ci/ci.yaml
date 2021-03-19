@@ -1,0 +1,157 @@
+---
+resource_types:
+  - name: pull-request
+    type: registry-image
+    source:
+      repository: docker.io/teliaoss/github-pr-resource
+resources:
+  - name: pull-request
+    type: pull-request
+    icon: source-branch
+    check_every: 1m
+    source:
+      repository: realliance/senior-matchmaking
+      access_token: ((github-access-token))
+      disable_ci_skip: true
+  - name: senior-matchmaking-main
+    type: git
+    icon: git
+    source:
+      uri: https://github.com/realliance/senior-matchmaking
+      branch: main
+  - name: quay
+    type: registry-image
+    icon: docker
+    source:
+      repository: quay.io/realliance/senior-matchmaking
+      tag: latest
+      username: ((quay-ci-account.username))
+      password: ((quay-ci-account.token))
+  - name: node
+    type: registry-image
+    icon: docker
+    source:
+      repository: docker.io/node
+      tag: fermium-alpine
+  - name: python
+    type: registry-image
+    icon: docker
+    source:
+      repository: docker.io/python
+      tag: alpine3.12
+  - name: oci-build-task
+    type: registry-image
+    icon: docker
+    source:
+      repository: docker.io/vito/oci-build-task
+jobs:
+  - name: validate-pr
+    plan:
+      - get: pull-request
+        trigger: true
+        version: every
+      - put: pull-request
+        params:
+          path: pull-request
+          status: pending
+      - get: node
+      - get: python
+      - task: install-packages
+        image: node
+        config:
+          platform: linux
+          inputs:
+            - name: pull-request
+              path: .
+          caches:
+            - path: node_modules
+          run:
+            path: /bin/sh
+            args:
+              - -exc
+              - |
+                yarn install
+      - in_parallel:
+          - task: jest
+            image: node
+            config:
+              platform: linux
+              inputs:
+                - name: pull-request
+                  path: .
+              caches:
+                - path: node_modules
+              run:
+                path: /bin/sh
+                args:
+                  - -exc
+                  - |
+                    yarn jest
+          - task: eslint
+            image: node
+            config:
+              platform: linux
+              inputs:
+                - name: pull-request
+                  path: .
+              caches:
+                - path: node_modules
+              run:
+                path: /bin/sh
+                args:
+                  - -exc
+                  - |
+                    yarn eslint src
+          - task: yamllint
+            image: python
+            config:
+              platform: linux
+              inputs:
+                - name: pull-request
+                  path: .
+              caches:
+                - path: cache
+              run:
+                path: /bin/sh
+                args:
+                  - -exc
+                  - |
+                    pip install --cache-dir ./cache yamllint
+                    yamllint .
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+      - put: pull-request
+        params:
+          path: pull-request
+          status: success
+  - name: set-pipeline
+    plan:
+      - get: senior-matchmaking-main
+        trigger: true
+      - set_pipeline: self
+        file: senior-matchmaking-main/ci/ci.yaml
+  - name: publish
+    plan:
+      - get: senior-matchmaking-main
+        trigger: true
+      - get: oci-build-task
+      - task: build
+        privileged: true
+        image: oci-build-task
+        config:
+          platform: linux
+          inputs:
+            - name: senior-matchmaking-main
+              path: .
+          outputs:
+            - name: image
+          caches:
+            - path: cache
+          run:
+            path: build
+      - put: quay
+        params:
+          image: image/image.tar

@@ -6,7 +6,7 @@ export interface QueueEntry {
 }
 
 export class MatchConfig {
-    numPlayers = parseInt(process.env.MATCH_PLAYERS || "8");
+    numPlayers = parseInt(process.env.MATCH_PLAYERS || '8', 10);
 
     confirmTimeout = 12 * 1000;
 }

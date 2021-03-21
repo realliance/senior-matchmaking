@@ -1,0 +1,201 @@
+---
+resource_types:
+  - name: pull-request
+    type: registry-image
+    source:
+      repository: docker.io/teliaoss/github-pr-resource
+resources:
+  - name: pull-request
+    type: pull-request
+    icon: source-branch
+    webhook_token: ((webhook-token))
+    check_every: 1h
+    source:
+      repository: realliance/senior-matchmaking
+      access_token: ((github-access-token))
+      disable_ci_skip: true
+  - name: senior-matchmaking-main
+    type: git
+    icon: git
+    webhook_token: ((webhook-token))
+    check_every: 1h
+    source:
+      uri: https://github.com/realliance/senior-matchmaking
+      branch: main
+  - name: quay
+    type: registry-image
+    icon: docker
+    check_every: 1h
+    source:
+      repository: quay.io/realliance/senior-matchmaking
+      tag: latest
+      username: ((quay-ci-account.username))
+      password: ((quay-ci-account.token))
+  - name: node
+    type: registry-image
+    icon: docker
+    check_every: 1h
+    source:
+      repository: docker.io/node
+      tag: fermium-alpine
+  - name: python
+    type: registry-image
+    icon: docker
+    check_every: 1h
+    source:
+      repository: docker.io/python
+      tag: alpine3.12
+  - name: oci-build-task
+    type: registry-image
+    icon: docker
+    check_every: 1h
+    source:
+      repository: docker.io/vito/oci-build-task
+  - name: sentry-cli
+    type: registry-image
+    icon: docker
+    check_every: 1h
+    source:
+      repository: docker.io/getsentry/sentry-cli
+jobs:
+  - name: validate-pr
+    plan:
+      - get: pull-request
+        trigger: true
+        version: every
+      - put: pull-request
+        params:
+          path: pull-request
+          status: pending
+      - get: node
+      - get: python
+      - in_parallel:
+          - task: jest
+            image: node
+            config:
+              platform: linux
+              inputs:
+                - name: pull-request
+                  path: .
+              caches:
+                - path: node_modules
+                - path: .yarn
+              run:
+                path: /bin/sh
+                args:
+                  - -exc
+                  - |
+                    yarn install --cache-folder .yarn
+                    yarn run jest
+          - task: eslint
+            image: node
+            config:
+              platform: linux
+              inputs:
+                - name: pull-request
+                  path: .
+              caches:
+                - path: node_modules
+                - path: .yarn
+              run:
+                path: /bin/sh
+                args:
+                  - -exc
+                  - |
+                    yarn install --cache-folder .yarn
+                    yarn run eslint src
+          - task: yamllint
+            image: python
+            config:
+              platform: linux
+              inputs:
+                - name: pull-request
+                  path: .
+              caches:
+                - path: cache
+              run:
+                path: /bin/sh
+                args:
+                  - -exc
+                  - |
+                    pip install --cache-dir ./cache yamllint
+                    yamllint .
+        on_failure:
+          put: pull-request
+          params:
+            path: pull-request
+            status: failure
+      - put: pull-request
+        params:
+          path: pull-request
+          status: success
+  - name: set-pipeline
+    plan:
+      - get: senior-matchmaking-main
+        trigger: true
+      - set_pipeline: self
+        file: senior-matchmaking-main/ci/ci.yaml
+  - name: publish
+    plan:
+      - get: senior-matchmaking-main
+        trigger: true
+      - get: oci-build-task
+      - get: sentry-cli
+      - task: sentry-new
+        image: sentry-cli
+        params:
+          SENTRY_ORG: ((sentry.org))
+          SENTRY_AUTH_TOKEN: ((sentry.auth-token))
+          SENTRY_URL: ((sentry.url))
+        config:
+          platform: linux
+          inputs:
+            - name: senior-matchmaking-main
+              path: .
+          outputs:
+            - name: release
+          run:
+            path: /bin/sh
+            args:
+              - -exc
+              - |
+                VERSION=senior-matchmaking@$(sentry-cli releases propose-version)
+                echo $VERSION > release/version.txt
+                sentry-cli releases new -p senior-matchmaking "$VERSION"
+                sentry-cli releases set-commits --auto "$VERSION"
+      - load_var: sentry-release
+        file: release/version.txt
+      - task: build
+        privileged: true
+        image: oci-build-task
+        params:
+          BUILD_ARG_RELEASE: ((.:sentry-release))
+        config:
+          platform: linux
+          inputs:
+            - name: senior-matchmaking-main
+              path: .
+          outputs:
+            - name: image
+          caches:
+            - path: cache
+          run:
+            path: build
+      - put: quay
+        params:
+          image: image/image.tar
+      - task: sentry-finalize
+        image: sentry-cli
+        params:
+          SENTRY_ORG: ((sentry.org))
+          SENTRY_AUTH_TOKEN: ((sentry.auth-token))
+          SENTRY_URL: ((sentry.url))
+          VERSION: ((.:sentry-release))
+        config:
+          platform: linux
+          run:
+            path: /bin/sh
+            args:
+              - -exc
+              - |
+                sentry-cli releases finalize "$VERSION"

@@ -1,5 +1,10 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/"
+  },
   "exclude": [
     "jest.config.js",
     "src/tests",

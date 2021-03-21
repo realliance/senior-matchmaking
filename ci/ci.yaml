@@ -69,22 +69,6 @@ jobs:
           status: pending
       - get: node
       - get: python
-      - task: install-packages
-        image: node
-        config:
-          platform: linux
-          inputs:
-            - name: pull-request
-              path: .
-          caches:
-            - path: node_modules
-            - path: .yarn
-          run:
-            path: /bin/sh
-            args:
-              - -exc
-              - |
-                yarn install --cache-folder .yarn
       - in_parallel:
           - task: jest
             image: node

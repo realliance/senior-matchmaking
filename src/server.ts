@@ -6,20 +6,18 @@ import { MatchMakingServer } from './mmserver';
 
 global.rootdir = __dirname || process.cwd();
 
-if (process.env.NODE_ENV === 'production') {
-    if (process.env.SENTRY_DSN) {
-        Sentry.init({
-            dsn: process.env.SENTRY_DSN,
-            release: `senior-matchmaking@${process.env.RELEASE}`,
-            integrations: [
-                new RewriteFrames({
-                    root: global.rootdir,
-                }),
-            ],
-        });
-    } else {
-        console.warn('Warning: SENTRY_DSN not supplied!');
-    }
+if (process.env.SENTRY_DSN && process.env.RELEASE) {
+    Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        release: process.env.RELEASE,
+        integrations: [
+            new RewriteFrames({
+                root: global.rootdir,
+            }),
+        ],
+    });
+} else {
+    console.warn('Warning: Sentry environment variables missing!');
 }
 
 const server = new grpc.Server();

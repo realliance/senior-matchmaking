@@ -25,7 +25,7 @@
     "@kubernetes/client-node": "0.14.0",
     "@sentry/integrations": "6.2.5",
     "@sentry/node": "6.2.5",
-    "@types/node": "14.14.36",
+    "@types/node": "14.14.37",
     "google-protobuf": "3.15.6",
     "superagent": "6.1.0",
     "tslib": "2.1.0",

@@ -22,7 +22,8 @@
     "@typescript-eslint/indent": ["error", 4],
     "no-param-reassign":0,
     "class-methods-use-this":0,
-    "no-console":0
+    "no-console":0,
+    "@typescript-eslint/no-namespace": "off"
   },
   "env": {
     "jest": true

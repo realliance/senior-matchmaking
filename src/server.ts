@@ -24,7 +24,7 @@ if (process.env.SENTRY_DSN && process.env.RELEASE) {
             }),
         ],
     });
-} else if(process.env.RELEASE) {
+} else if (process.env.RELEASE) {
     console.warn('Warning: Sentry environment variables missing!');
 }
 

@@ -18,6 +18,10 @@ jest.mock('../mmresource', () => ({
             port: 1001,
             serverName: 'fake-server',
         }),
+
+        setMatchCleanupCallback: () : void => {
+
+        },
     })),
 }));
 

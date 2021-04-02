@@ -4,6 +4,14 @@ import { RewriteFrames } from '@sentry/integrations';
 import { MatchMakingService } from './proto/matchmaking_grpc_pb';
 import { MatchMakingServer } from './mmserver';
 
+declare global {
+    namespace NodeJS {
+        interface Global {
+            rootdir: string;
+        }
+    }
+}
+
 global.rootdir = __dirname || process.cwd();
 
 if (process.env.SENTRY_DSN && process.env.RELEASE) {
@@ -16,7 +24,7 @@ if (process.env.SENTRY_DSN && process.env.RELEASE) {
             }),
         ],
     });
-} else {
+} else if(process.env.RELEASE) {
     console.warn('Warning: Sentry environment variables missing!');
 }
 

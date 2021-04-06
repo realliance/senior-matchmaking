@@ -82,10 +82,9 @@ export class MatchMakingServerAllocator {
                 port: alloc.status.ports[0].port,
                 serverName: alloc.status.gameServerName,
             };
-        } else {
-            console.log(`[Kube Allocator] Allocation failure!`);
         }
 
+        console.log(`[Kube Allocator] Allocation failure!`);
         return null;
     }
 

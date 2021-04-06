@@ -23,7 +23,8 @@
     "no-param-reassign":0,
     "class-methods-use-this":0,
     "no-console":0,
-    "@typescript-eslint/no-namespace": "off"
+    "@typescript-eslint/no-namespace": "off",
+    "@typescript-eslint/quotes":["error", "single", { "allowTemplateLiterals": true }]
   },
   "env": {
     "jest": true

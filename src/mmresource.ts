@@ -62,6 +62,7 @@ export class MatchMakingServerAllocator {
     }
 
     async allocateServer() : Promise<ServerRecord|null> {
+        console.log('[Kube Allocator] Requesting Gameserver Allocation');
         const res = await this.api.createNamespacedCustomObject('allocation.agones.dev', 'v1', this.namespace, 'gameserverallocations', {
             kind: 'GameServerAllocation',
             spec: {
@@ -75,11 +76,14 @@ export class MatchMakingServerAllocator {
 
         const alloc : AllocationResponse = <AllocationResponse> res.body;
         if (alloc?.status?.state === 'Allocated') {
+            console.log(`[Kube Allocator] Allocated resource ${alloc.status.gameServerName}`);
             return {
                 ip: alloc.status.address,
                 port: alloc.status.ports[0].port,
                 serverName: alloc.status.gameServerName,
             };
+        } else {
+            console.log(`[Kube Allocator] Allocation failure!`);
         }
 
         return null;
@@ -89,6 +93,7 @@ export class MatchMakingServerAllocator {
         if (phase === 'DELETED') {
             const name = apiObj?.metadata?.name;
             if (name !== undefined && this.matchCleanupCallback) {
+                console.log(`[Kube Allocator] Cleaned up resource ${name}`);
                 this.matchCleanupCallback(name);
             }
         }

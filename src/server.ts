@@ -34,6 +34,7 @@ server.addService(MatchMakingService, new MatchMakingServer());
 server.bindAsync('0.0.0.0:4000', grpc.ServerCredentials.createInsecure(), (error: Error | null) => {
     if (error) throw error;
     server.start();
+    console.log('RPC Server started.');
 });
 
 process.on('unhandledRejection', (error: Error | null) => {

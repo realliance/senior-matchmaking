@@ -23,6 +23,8 @@ export class MatchMakingServer implements IMatchMakingServer {
             return;
         }
 
+        console.log(`Client connected from ${call.getPeer()}`);
+
         playerQueue.onPlayerConnected(ply, {
             write: call.write.bind(call),
             end: call.end.bind(call),

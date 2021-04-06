@@ -31,8 +31,12 @@ export class MatchMakingQueue {
     queueMain : NodeJS.Timeout|null = null;
 
     constructor() {
-        this.queueMain = setInterval(this.serveQueue.bind(this), 1000);
-        this.allocator.setMatchCleanupCallback(this.handleResourceCleanup.bind(this));
+        this.queueMain = setInterval(() => {
+            this.serveQueue();
+        }, 1000);
+        this.allocator.setMatchCleanupCallback((name: string) => {
+            this.handleResourceCleanup(name);
+        });
     }
 
     getPlayerInfo(ply: Player) : PlayerInfo {
@@ -97,15 +101,14 @@ export class MatchMakingQueue {
         if (match.players.every((ply:Player) => this.getPlayerInfo(ply).matchState === MatchingState.STATE_CONFIRMED)) {
             // Time to spin up a server here
             const serverDetails: ServerRecord|null = await this.allocator.allocateServer();
-            if (serverDetails !== null) {
-                match.parameters = serverDetails;
-                this.serverIDToMatch[serverDetails.serverName] = match;
-
-                await notifyMatchInit(match);
-            } else {
+            if (serverDetails === null) {
                 // Something bad happened and we could not allocate a server
                 return false;
             }
+
+            match.parameters = serverDetails;
+            this.serverIDToMatch[serverDetails.serverName] = match;
+            await notifyMatchInit(match);
 
             // Mark players as IN_GAME, at this point match parameters can be retreived
             match.players.forEach((ply: Player) => {

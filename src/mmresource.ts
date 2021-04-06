@@ -44,7 +44,7 @@ export class MatchMakingServerAllocator {
     constructor(fleet: string, namespace: string) {
         const kc: KubeConfig = new KubeConfig();
 
-        if(process.env.KUBE_EXTENDEDLOAD !== undefined) {
+        if (process.env.KUBE_EXTENDEDLOAD !== undefined) {
             kc.loadFromDefault();
         } else {
             kc.loadFromCluster();

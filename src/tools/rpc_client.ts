@@ -16,8 +16,8 @@ console.log('Using token', md.get('token').toString());
 const stream = client.queue(md);
 stream.on('data', (data: MMQServerUpdate) => {
     console.log('Matchmaking update');
-    console.log('Status', MMQServerUpdate.QueueUpdate[data.getStatus()]);
-    console.log('Queue state', MatchingState[data.getQueueState()]);
+    console.log('Status', data.getStatus());
+    console.log('Queue state', data.getQueueState());
 
     if (!sentJoin) {
         const upd : MMQClientUpdate = new MMQClientUpdate();

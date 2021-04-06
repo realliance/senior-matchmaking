@@ -22,6 +22,8 @@ export class MatchMakingQueue {
 
     playerToMatch: Record<PlayerUID, Match> = {};
 
+    serverIDToMatch : Record<string, Match> = {};
+
     config: MatchConfig = new MatchConfig();
 
     allocator: MatchMakingServerAllocator = new MatchMakingServerAllocator(process.env.ALLOCATOR_FLEET || '', process.env.ALLOCATOR_NAMESPACE || '');
@@ -29,7 +31,12 @@ export class MatchMakingQueue {
     queueMain : NodeJS.Timeout|null = null;
 
     constructor() {
-        this.queueMain = setInterval(this.serveQueue.bind(this), 1000);
+        this.queueMain = setInterval(() => {
+            this.serveQueue();
+        }, 1000);
+        this.allocator.setMatchCleanupCallback((name: string) => {
+            this.handleResourceCleanup(name);
+        });
     }
 
     getPlayerInfo(ply: Player) : PlayerInfo {
@@ -94,14 +101,14 @@ export class MatchMakingQueue {
         if (match.players.every((ply:Player) => this.getPlayerInfo(ply).matchState === MatchingState.STATE_CONFIRMED)) {
             // Time to spin up a server here
             const serverDetails: ServerRecord|null = await this.allocator.allocateServer();
-            if (serverDetails !== null) {
-                match.parameters = serverDetails;
-
-                await notifyMatchInit(match);
-            } else {
+            if (serverDetails === null) {
                 // Something bad happened and we could not allocate a server
                 return false;
             }
+
+            match.parameters = serverDetails;
+            this.serverIDToMatch[serverDetails.serverName] = match;
+            await notifyMatchInit(match);
 
             // Mark players as IN_GAME, at this point match parameters can be retreived
             match.players.forEach((ply: Player) => {
@@ -156,6 +163,23 @@ export class MatchMakingQueue {
         }, this.config.confirmTimeout);
 
         return true;
+    }
+
+    // Called when the match is over with and needs to be torn down.
+    // Deletes match from memory, cleans up player state, and returns players to the idle state
+    cleanupMatch(match: Match) : void {
+        match.players.forEach((pl : Player) : void => {
+            delete this.playerToMatch[pl.uid];
+            this.updatePlayerState(pl, MatchingState.STATE_IDLE);
+        });
+    }
+
+    handleResourceCleanup(name : string) : void {
+        console.log(`Cleaning up server ${name}`);
+        if (this.serverIDToMatch[name]) {
+            this.cleanupMatch(this.serverIDToMatch[name]);
+            delete this.serverIDToMatch[name];
+        }
     }
 
     handleJoin(ply: Player) : void {

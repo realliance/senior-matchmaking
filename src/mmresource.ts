@@ -1,4 +1,4 @@
-import { KubeConfig, CustomObjectsApi } from '@kubernetes/client-node';
+import { KubeConfig, CustomObjectsApi, Watch } from '@kubernetes/client-node';
 import { ServerRecord } from './mmmatch';
 
 export interface AllocationResponse {
@@ -24,12 +24,22 @@ export interface AllocationResponse {
     }
 }
 
+interface ApiObject {
+    metadata : {
+        name : string;
+    }
+}
+
 export class MatchMakingServerAllocator {
     api: CustomObjectsApi;
 
     fleet: string;
 
     namespace: string;
+
+    watch : Watch;
+
+    matchCleanupCallback? : (name : string) => void;
 
     constructor(fleet: string, namespace: string) {
         const kc: KubeConfig = new KubeConfig();
@@ -38,6 +48,11 @@ export class MatchMakingServerAllocator {
 
         this.fleet = fleet;
         this.namespace = namespace;
+
+        this.watch = new Watch(kc);
+        this.watch.watch(`/apis/agones.dev/v1/namespaces/${namespace}/gameservers`, {},
+            this.internalWatchCallback.bind(this),
+            this.internalWatchDone.bind(this));
     }
 
     async allocateServer() : Promise<ServerRecord|null> {
@@ -62,5 +77,23 @@ export class MatchMakingServerAllocator {
         }
 
         return null;
+    }
+
+    internalWatchCallback(phase : string, apiObj : ApiObject) : void {
+        if (phase === 'DELETED') {
+            const name = apiObj?.metadata?.name;
+            if (name !== undefined && this.matchCleanupCallback) {
+                this.matchCleanupCallback(name);
+            }
+        }
+    }
+
+    internalWatchDone(err : string) : void {
+        console.log('Watch disconnected:');
+        console.log(err);
+    }
+
+    setMatchCleanupCallback(func : (name : string) => void) : void {
+        this.matchCleanupCallback = func;
     }
 }

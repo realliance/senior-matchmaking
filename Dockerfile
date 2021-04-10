@@ -4,7 +4,9 @@ WORKDIR /app
 
 ADD package.json .
 ADD yarn.lock .
-RUN yarn install
+RUN apk add --no-cache --virtual .gyp python g++ make \
+    && yarn install \
+    && apk del .gyp
 
 ADD . .
 RUN NODE_ENV=production yarn build
@@ -16,7 +18,9 @@ ENV RELEASE $RELEASE
 
 ADD package.json .
 ADD yarn.lock .
-RUN yarn install
+RUN apk add --no-cache --virtual .gyp python g++ make \
+    && yarn install \
+    && apk del .gyp
 
 COPY --from=builder /app/bin /app/bin
 

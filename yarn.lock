@@ -2994,11 +2994,6 @@ google-p12-pem@^3.0.3:
   dependencies:
     node-forge "^0.10.0"
 
-google-protobuf@3.12.4:
-  version "3.12.4"
-  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.12.4.tgz#fd89b7e5052cdb35a80f9b455612851d542a5c9f"
-  integrity sha512-ItTn8YepDQMHEMHloUPH+FDaTPiHTnbsMvP50aXfbI65IK3AA5+wXlHSygJH8xz+h1g4gu7V+CK5X1/SaGITsA==
-
 google-protobuf@3.15.8:
   version "3.15.8"
   resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.15.8.tgz#5f3948905e4951c867d6bc143f385a80e2a39efe"
@@ -3038,12 +3033,12 @@ grpc-tools@1.11.1:
   dependencies:
     node-pre-gyp "^0.15.0"
 
-grpc_tools_node_protoc_ts@5.1.3:
-  version "5.1.3"
-  resolved "https://registry.yarnpkg.com/grpc_tools_node_protoc_ts/-/grpc_tools_node_protoc_ts-5.1.3.tgz#c24d6470b6f0204a7ec920cee0f057fcb11eea66"
-  integrity sha512-BiElSWEmRgrhWFV/+yFtRiqxC3D/nrk1g0GezJ/9ZrJxUvu/0sBVeqe4rTmkFFqQVZTRX1+MNOVeOJKDmQ41Xg==
+grpc_tools_node_protoc_ts@5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/grpc_tools_node_protoc_ts/-/grpc_tools_node_protoc_ts-5.2.0.tgz#6411a536c007fdc12452576ede5024cb7cc772c4"
+  integrity sha512-I3Jf2xl9gBkeLIZ57E4zOy6YrYqnTuplrT/5qbkYGh8ar7bwTn2NKEIbmHtuvfM+YA5f0OKDlSo6fhj36g/c4g==
   dependencies:
-    google-protobuf "3.12.4"
+    google-protobuf "3.15.8"
     handlebars "4.7.6"
     handlebars-helpers "0.10.0"
 

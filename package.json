@@ -21,7 +21,7 @@
     "ts-node-dev": "1.1.6"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.2.12",
+    "@grpc/grpc-js": "1.4.4",
     "@kubernetes/client-node": "0.14.2",
     "@sentry/integrations": "6.2.5",
     "@sentry/node": "6.2.5",

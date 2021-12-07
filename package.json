@@ -23,8 +23,8 @@
   "dependencies": {
     "@grpc/grpc-js": "1.2.12",
     "@kubernetes/client-node": "0.14.2",
-    "@sentry/integrations": "6.2.5",
-    "@sentry/node": "6.2.5",
+    "@sentry/integrations": "6.16.0",
+    "@sentry/node": "6.16.0",
     "@types/node": "14.14.37",
     "google-protobuf": "3.15.8",
     "superagent": "6.1.0",
